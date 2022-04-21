@@ -1,67 +1,48 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, {useState} from "react";
+import { Link } from "react-router-dom";
 import Teach from './Teach';
 import Home from './Home';
 import Learn from './Learn';
-import {AppBar, Typography, Toolbar, Tabs, Tab} from "@mui/material"
+import {AppBar, Typography, Toolbar, Tabs, Tab, Button} from "@mui/material"
 import SchoolIcon from '@mui/icons-material/School';
 import '../styles/Navbar.css'
 
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 const pages = ['Home', 'Learn', 'Teach'];
 
-const Navbar = ()=>{
-    
+
+const Navbar = ()=>{ 
+    //Defines the current active tab
+    const [value, setValue]  = useState("/");
     return(
         <>
             <BrowserRouter>
             
-            <AppBar sx={{background:"#063970"}}>
-                <Toolbar>
-                    <SchoolIcon fontSize="large"/>
-                    <Typography>
-                        Learn Languages
-                                          
-                    </Typography>
-                    
-                    <Tabs textColor="inherit">
-                        <Tab label="Home" component={NavLink} to={"/"}></Tab>
-                        <Tab label="Teach" component={NavLink} to={"/teach"}></Tab>
-                        <Tab label="Learn" component={NavLink} to={"/learn"}></Tab>                                              
-                    </Tabs>            
-                </Toolbar>
-            </AppBar>
-           
-            <Routes>
-          <Route path="/" element={<Home/>}></Route>
-          <Route path="/teach" element={<Teach/>}></Route>
-          <Route path="/learn" element={<Learn/>}></Route>
-        </Routes>
+                <AppBar sx={{background:"#063970"}}>
+                    <Toolbar>
+                        <SchoolIcon fontSize="large"/>
+                        <Typography>
+                            Learn Languages
+                                            
+                        </Typography>
+                        
+                        <Tabs sx={{marginLeft:"auto"}} textColor="inherit" value={value} onChange={(e, value)=>setValue(value)} indicatorColor="secondary">
+                            <Tab label="Home" value={"/"}  component={Link} to={"/"}></Tab>
+                            <Tab label="Teach" value={"/teach"} component={Link} to={"/teach"}></Tab>
+                            <Tab label="Learn" value={"/learn"} component={Link} to={"/learn"}></Tab>                                              
+                        </Tabs> 
+                        <Button sx={{marginLeft:"auto"}} variant="contained">Login </Button>
+                        <Button sx={{marginLeft:"10px"}} variant="contained">Register</Button>           
+                    </Toolbar>
+                </AppBar>           
+                <Routes>
+                    <Route path="/" element={<Home/>}></Route>
+                    <Route path="/teach" element={<Teach/>}></Route>
+                    <Route path="/learn" element={<Learn/>}></Route>
+                </Routes>
             </BrowserRouter>
             
         </>
-     /*   <>
-            <nav>
-                <h2>Learn Languages</h2>
-                <ul>
-                    <li>
-                        <NavLink to="/">HOME</NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/teach">TEACH</NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/learn">LEARN</NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/login">LOGIN</NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/register">REGISTER</NavLink>
-                    </li>
-                </ul>
-            </nav>
-        </>*/
     )
 }
 
