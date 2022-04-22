@@ -5,7 +5,6 @@ import Home from './Home';
 import Learn from './Learn';
 import {AppBar, Typography, Toolbar, Tabs, Tab, Button} from "@mui/material"
 import SchoolIcon from '@mui/icons-material/School';
-import '../styles/Navbar.css'
 
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 const pages = ['Home', 'Learn', 'Teach'];
@@ -16,8 +15,7 @@ const Navbar = ()=>{
     const [value, setValue]  = useState("/");
     return(
         <>
-            <BrowserRouter>
-            
+            <BrowserRouter>            
                 <AppBar sx={{background:"#063970"}}>
                     <Toolbar>
                         <SchoolIcon fontSize="large"/>
