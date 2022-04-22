@@ -1,5 +1,6 @@
-import { valueToPercent } from "@mui/base";
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
+import '../styles/style.css'
+const axios = require('axios')
 
 const Teach = ()=>{
   const [wordObj, setWordObj] = useState({
@@ -7,17 +8,30 @@ const Teach = ()=>{
     finWord: "",
     category: "",
   });
-  const allTags = [{id:1, name:"Colors"}, {id:2, name:"Animals"}]
+  //const allTags = [{id:1, name:"Colors"}, {id:2, name:"Animals"}]
+  const [allTags, setAllTags] = useState([])
   const handleInput = (event)=>{
     const name = event.target.name;
     const value = event.target.value;
     console.log(`${name} : ${value}`)
     setWordObj({...wordObj, [name]:value})
   }
-  const handleSubmit = (event)=>{
+  const handleSubmit = async (event)=>{
     event.preventDefault();
     console.log(wordObj)
+    const resp = await axios.post('http://localhost:8080/add', wordObj)
+    console.log(resp)
   }
+
+  useEffect(()=>{    
+      async function getTags(){
+          console.log('getting tags')
+      let hr = await axios.get('http://localhost:8080/tags');
+      console.log(hr.data)
+      setAllTags(hr.data);
+    }   
+     getTags(); 
+  },[])
     return(
         <>
         <div className="teach-container">
@@ -26,18 +40,21 @@ const Teach = ()=>{
                 <form>
                     <div>
                         <div>
+                            <div className="form-fields">
                             <label htmlFor="engWord">English Word</label>
+                            </div>
+                            <div>                           
+                                <input
+                                    type="text"
+                                    name="engWord"
+                                    id="engWord"
+                                    value={wordObj.engWord}
+                                    onChange={handleInput}
+                                    required>
+                                </input>            
+                            </div>
                         </div>
-                        <div>                           
-                            <input
-                                type="text"
-                                name="engWord"
-                                id="engWord"
-                                value={wordObj.engWord}
-                                onChange={handleInput}
-                                required>
-                            </input>            
-                        </div>
+                        
                         <div>
                             <label htmlFor="finWord">Finnish Word</label>
                         </div>
@@ -69,8 +86,8 @@ const Teach = ()=>{
                                     className="tag"
                                     name="category"
                                     id="category"
-                                    value={tag.name}>
-                                    {tag.name}
+                                    value={tag.id}>
+                                    {tag.NAME}
                                 </option>
                                 ))}
                             </select>       
