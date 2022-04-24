@@ -22,14 +22,23 @@ app.get("/tags", async (req, resp)=>{
     }    
 });
 
-app.post('/add', async (req, resp)=>{
+app.get("/teach", async (req, resp)=>{
+    try{
+        //const filters=req.query;
+        const results = await database.findAll();
+        resp.send(results);
+    }catch(err){
+        resp.status(500).end();
+    }    
+});
+
+app.post('/teach', async (req, resp)=>{
     try{
       console.log("Adding Words")
         let newWord = req.body;
         console.log(newWord)        
           const saved=await database.save(newWord)
-            resp.status(201).send(saved) 
-           // resp.send(`Adding Words`)   
+            resp.status(201).send(saved)              
         
     }catch(err){
         resp.status(500).end();
