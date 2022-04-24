@@ -37,7 +37,20 @@ let connectionFunctions = {
         })
         
     },
-    
+    findAll: () =>{
+        let sql = "SELECT eng_word_master.id as eng_id,eng_word_master.word as eng_word,fin_word_master.id AS fin_id,fin_word_master.word as fin_word, category_master.name FROM eng_word_master" + 
+                    " JOIN word_meaning ON eng_word_master.id = word_meaning.eng_id"+
+                    " JOIN fin_word_master ON fin_word_master.id = word_meaning.fin_id"+
+                    " JOIN category_master ON eng_word_master.category_id = category_master.id;"  
+        console.log(sql)      
+        return new Promise((resolve, reject)=>{
+                connection.query(sql, (err, results)=>{
+                err ? reject(err) : resolve(results)
+            })
+        })
+        
+    },
+
     save:async (newWord)=>{
         
             const sql1 = "INSERT INTO eng_word_master (word, category_id) VALUES (?, ?)"
@@ -56,8 +69,7 @@ let connectionFunctions = {
                 await connection.rollback();
                 console.log(err)
                 return("error!")                
-            }    
-
+            }   
     },
     
     close: (callback)=>{
