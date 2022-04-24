@@ -8,7 +8,8 @@ const Teach = ()=>{
     finWord: "",
     category: "",
   });
-  //const allTags = [{id:1, name:"Colors"}, {id:2, name:"Animals"}]
+  const [query, setQuery] = useState("");
+  const [records, setRecords] = useState([])
   const [allTags, setAllTags] = useState([])
   const handleInput = (event)=>{
     const name = event.target.name;
@@ -19,19 +20,23 @@ const Teach = ()=>{
   const handleSubmit = async (event)=>{
     event.preventDefault();
     console.log(wordObj)
-    const resp = await axios.post('http://localhost:8080/add', wordObj)
+    const resp = await axios.post('http://localhost:8080/teach', wordObj)
     console.log(resp)
   }
-
-  useEffect(()=>{    
-      async function getTags(){
-          console.log('getting tags')
+   async function getData(){
+        console.log("locationsssss")
       let hr = await axios.get('http://localhost:8080/tags');
-      console.log(hr.data)
       setAllTags(hr.data);
-    }   
-     getTags(); 
+      let hrData = await axios.get('http://localhost:8080/teach');
+      console.log(hrData.data)
+      setRecords(hrData.data);
+    }  
+   useEffect(()=>{   
+    
+      getData();
+      
   },[])
+  
     return(
         <>
         <div className="teach-container">
@@ -97,6 +102,52 @@ const Teach = ()=>{
                         </div>
                     </div>
                 </form>
+            </div>
+            <div>
+                <table>
+                    <tbody>
+                    <tr>
+                        <th colSpan="4">
+                        <input
+                            className="search-box"
+                            type="text"
+                            placeholder="Search Here"
+                            onChange={(event) => setQuery(event.target.value)}
+                        />
+                        </th>
+                    </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>English Word</td>
+                            <td>Finish Word</td>
+                            <td>Category</td>
+                            <td>Action</td>
+                        </tr>
+                    </tbody>
+                    {records.filter(record=>{                       
+                            if(query===""){
+                            return record
+                            }else if(record.eng_word.toLowerCase().includes(query.toLocaleLowerCase()) ||
+                                     record.fin_word.toLowerCase().includes(query.toLocaleLowerCase()) ||
+                                     record.name.toLowerCase().includes(query.toLocaleLowerCase())){
+                                return record
+                            }else return null
+                    })
+                    
+                    .map(record=>{
+                        return(<tbody key = {record.eng_id}>
+                        <tr>
+                            <td>{record.eng_word}</td>
+                            <td>{record.fin_word}</td>
+                            <td>{record.name}</td>
+                            <td>Edit, Delete</td>
+                        </tr>
+                    </tbody>)
+                    })}
+                    
+                </table>
+                
             </div>
             
         </div>  
