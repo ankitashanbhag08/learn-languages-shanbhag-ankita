@@ -1,5 +1,11 @@
 import React, {useState, useEffect} from "react";
 import '../styles/style.css'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faTrashAlt,
+  faEdit,
+} from "@fortawesome/free-solid-svg-icons";
+
 const axios = require('axios')
 
 const Teach = ()=>{
@@ -7,24 +13,103 @@ const Teach = ()=>{
     engWord: "",
     finWord: "",
     category: "",
+    engId:"",
+    finId:"",
+    catId:""
   });
+  const [ids, setIds] = useState({
+      eng:"", fin:"", tag:""
+  })
+  const [toggleSubmit, setToggleSubmit] = useState(true);
   const [query, setQuery] = useState("");
   const [records, setRecords] = useState([])
   const [allTags, setAllTags] = useState([])
+  const [msg, setMsg] = useState("")
+  
   const handleInput = (event)=>{
     const name = event.target.name;
     const value = event.target.value;
     console.log(`${name} : ${value}`)
     setWordObj({...wordObj, [name]:value})
   }
-  const handleSubmit = async (event)=>{
+  const handleReset = (event)=>{
     event.preventDefault();
-    console.log(wordObj)
-    const resp = await axios.post('http://localhost:8080/teach', wordObj)
-    console.log(resp)
+    setWordObj({engWord: "",
+    finWord: "",
+    category: "",
+    engId:"",
+    finId:"",
+    catId:""})
   }
+  const handleSubmit = async (event)=>{
+      event.preventDefault();
+    if(toggleSubmit){        
+        console.log(wordObj)
+        const resp = await axios.post('http://localhost:8080/teach', wordObj)
+        console.log("resp")
+        console.log(resp.data.engId)
+        if(resp.data.engId && resp.data.engId){
+            console.log("inside")
+            console.log(resp)
+            let newRecord = {eng_word: wordObj.engWord,
+            fin_word: wordObj.finWord,
+            name: Number(wordObj.category),
+            eng_Id:resp.data.engId,
+            fin_Id:resp.data.finId}
+            console.log(newRecord)
+            setRecords((record)=>[...record, newRecord])
+            setMsg("Records Saved!")
+        }
+        else {
+            console.log("not inside")
+            setMsg("Error in Saving!")}
+         
+        
+    }else{
+        const resp = await axios.patch(`http://localhost:8080/teach/${wordObj.engId}`, wordObj)
+        records.map((record)=>{            
+                if(record.eng_id===wordObj.engId){
+                    return{
+                        ...record,
+                        eng_word: wordObj.engWord,
+                        fin_word: wordObj.finWord,
+                        name: wordObj.category,
+                    }
+                }           
+        })
+        /*setRecords((record)=>[...record, {eng_word: wordObj.engWord,
+            fin_word: wordObj.finWord,
+            name: wordObj.category,
+            engId:wordObj.engId,
+            finId:wordObj.engId
+        }])*/
+        setToggleSubmit(true)
+        setMsg(resp.data) 
+    }
+    setWordObj({ 
+            engWord: "", 
+            finWord:"", 
+            category:"", 
+            engId:"",
+            finId:""})
+  }
+  const editItem = (record)=>{
+        console.log(record)
+        setToggleSubmit(false);
+        setWordObj({...wordObj, 
+            engWord: record.eng_word, 
+            finWord:record.fin_word, 
+            category:record.cat_id, 
+            engId:record.eng_id,
+            finId:record.fin_id})
+         }
+
+  const removeItem = (engId, finId)=>{ 
+      console.log(engId, finId)
+
+  }
+
    async function getData(){
-        console.log("locationsssss")
       let hr = await axios.get('http://localhost:8080/tags');
       setAllTags(hr.data);
       let hrData = await axios.get('http://localhost:8080/teach');
@@ -98,8 +183,15 @@ const Teach = ()=>{
                             </select>       
                         </div>
                         <div className="form-buttons">
-                            <button onClick={handleSubmit}>Create</button>
+                            {toggleSubmit ? 
+                                (<button onClick={handleSubmit}>Create</button>) :
+                                <button onClick={handleSubmit}>Edit</button>
+                            }
+                            <button onClick={handleReset}>Reset</button>
                         </div>
+                    </div>
+                    <div>
+                        {msg}
                     </div>
                 </form>
             </div>
@@ -135,13 +227,27 @@ const Teach = ()=>{
                             }else return null
                     })
                     
-                    .map(record=>{
-                        return(<tbody key = {record.eng_id}>
+                    .map((record, index)=>{
+                        return(<tbody key = {index}>
                         <tr>
                             <td>{record.eng_word}</td>
                             <td>{record.fin_word}</td>
                             <td>{record.name}</td>
-                            <td>Edit, Delete</td>
+                            <td>
+                                <FontAwesomeIcon
+                                className="icons delete"
+                                icon={faTrashAlt}
+                                title="Delete Item"
+                                onClick={() => removeItem(record.eng_id, record.fin_id)}
+                              />
+
+                              <FontAwesomeIcon
+                                className="icons edit"
+                                icon={faEdit}
+                                title="Edit Item"
+                                onClick={() => editItem(record)}
+                              />
+                            </td>
                         </tr>
                     </tbody>)
                     })}
