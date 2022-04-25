@@ -1,5 +1,6 @@
 require('dotenv').config()
-const mysql = require('mysql')
+const mysql = require('mysql');
+const { NULL } = require('mysql/lib/protocol/constants/types');
 
 var connection = mysql.createConnection({ 
  connectionLimit : 10,
@@ -41,7 +42,7 @@ let connectionFunctions = {
         let sql = "SELECT eng_word_master.id as eng_id,eng_word_master.word as eng_word,fin_word_master.id AS fin_id,fin_word_master.word as fin_word, category_master.name, category_master.id as cat_id FROM eng_word_master" + 
                     " JOIN word_meaning ON eng_word_master.id = word_meaning.eng_id"+
                     " JOIN fin_word_master ON fin_word_master.id = word_meaning.fin_id"+
-                    " JOIN category_master ON eng_word_master.category_id = category_master.id;"  
+                    " LEFT OUTER JOIN category_master ON eng_word_master.category_id = category_master.id;"  
         console.log(sql)      
         return new Promise((resolve, reject)=>{
                 connection.query(sql, (err, results)=>{
@@ -52,15 +53,16 @@ let connectionFunctions = {
     },
 
     save:async (newWord)=>{
-        
+            let category=null;
+            category = (newWord.category==="") ? category : newWord.category;
             const sql1 = "INSERT INTO eng_word_master (word, category_id) VALUES (?, ?)"
             const sql2 = "INSERT INTO fin_word_master (word, category_id) VALUES (?, ?)"
             const sql3 = "INSERT INTO word_meaning (eng_id, fin_id) VALUES (?, ?);"
             try{
                 await connection.beginTransaction();
-                let result1 = await insertData(sql1, [newWord.engWord, newWord.category])      
+                let result1 = await insertData(sql1, [newWord.engWord, category])      
                 
-                let result2 = await insertData(sql2, [newWord.finWord, newWord.category])
+                let result2 = await insertData(sql2, [newWord.finWord, category])
                 
                 let result3 = await insertData(sql3, [result1.insertId, result2.insertId])                
                 await connection.commit();
@@ -74,7 +76,9 @@ let connectionFunctions = {
     
     update: async(word)=>{
          console.log(word)
-         let category = Number(word.category)
+         let category=null;
+            category = (word.category==="") ? category : Number(word.category);
+         //let category = Number(word.category)
          let finId = Number(word.engId)
          let engId=Number(word.engId)
           
