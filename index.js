@@ -24,6 +24,7 @@ app.get("/tags", async (req, resp)=>{
 
 app.get("/teach", async (req, resp)=>{
     try{
+        console.log("get")
         //const filters=req.query;
         const results = await database.findAll();
         resp.send(results);
@@ -57,8 +58,27 @@ app.patch('/teach/:id([0-9]+)', async (req, resp)=>{
         console.log(err)
         resp.status(500).end();
     }
-})
+});
 
+app.delete('/teach', async (req, resp)=>{
+    try{
+        console.log("delete")
+        const idTodelete=req.query;
+        let finId = Number(idTodelete.finId);
+        let engId=Number(idTodelete.engId)
+        const rowDeleted = await database.delete(engId, finId);        
+        if(rowDeleted){
+            //204 No Content:The server has fulfilled the request but does not need to return a response body.
+            resp.status(200).send("Record Deleted");
+        }else{
+            //404 Not Found:The server can not find the requested resource.
+            resp.status(404).send("Record nor deleted"); 
+        } 
+    }catch(err){
+        //500:Internal Server Error
+        resp.status(500).end();
+    }
+});
 const server = app.listen(port, () => {
   console.log(`Listening on port ${server.address().port}`);
 }); 
