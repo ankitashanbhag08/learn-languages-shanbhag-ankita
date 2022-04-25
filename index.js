@@ -37,10 +37,24 @@ app.post('/teach', async (req, resp)=>{
       console.log("Adding Words")
         let newWord = req.body;
         console.log(newWord)        
-          const saved=await database.save(newWord)
-            resp.status(201).send(saved)              
+          const respObj=await database.save(newWord)
+            resp.status(201).send(respObj)              
         
     }catch(err){
+        resp.status(500).end();
+    }
+})
+
+app.patch('/teach/:id([0-9]+)', async (req, resp)=>{
+    try{
+        console.log("Updating Words")
+        let wordToEdit = req.body;
+        console.log(wordToEdit)        
+        const updated=await database.update(wordToEdit)
+        if(updated) resp.status(200).send("Record Updated") 
+        
+    }catch(err){
+        console.log(err)
         resp.status(500).end();
     }
 })
