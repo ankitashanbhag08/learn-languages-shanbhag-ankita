@@ -110,7 +110,28 @@ let connectionFunctions = {
          //   return("error!")
        // }
     },
-
+    delete:async (engId, finId)=>{
+        console.log("hello"  + engId)
+            let recordDeleted=false
+            const sql1 = "DELETE FROM eng_word_master where id = ?"
+            const sql2 = "DELETE FROM fin_word_master where id = ?"
+            const sql3 = "DELETE FROM word_meaning where eng_id = ? AND fin_id = ?"
+            try{
+                await connection.beginTransaction();
+                await insertData(sql1, [engId])      
+                console.log(sql1)
+                await insertData(sql2, [finId])
+                
+                await insertData(sql3, [engId, finId])                
+                await connection.commit();
+                recordDeleted=true
+                return(recordDeleted)
+            }catch(err){
+                await connection.rollback();
+                console.log(err)
+                return(recordDeleted)                
+            }
+    },
     close: (callback)=>{
         connection.end(()=>{
             console.log("Closing db")
