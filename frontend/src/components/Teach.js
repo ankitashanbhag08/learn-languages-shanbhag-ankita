@@ -43,46 +43,43 @@ const Teach = ()=>{
   }
   const handleSubmit = async (event)=>{
       event.preventDefault();
+      let category_name=""
+      let tagObj = allTags.find((tag)=>tag.id===Number(wordObj.category))
+      category_name = tagObj ? tagObj.NAME : category_name
     if(toggleSubmit){        
-        console.log(wordObj)
         const resp = await axios.post('http://localhost:8080/teach', wordObj)
-        console.log("resp")
-        console.log(resp.data.engId)
         if(resp.data.engId && resp.data.engId){
             console.log("inside")
             console.log(resp)
             let newRecord = {eng_word: wordObj.engWord,
             fin_word: wordObj.finWord,
-            name: Number(wordObj.category),
+            cat_id: Number(wordObj.category),
             eng_Id:resp.data.engId,
-            fin_Id:resp.data.finId}
+            fin_Id:resp.data.finId,
+            name:category_name}
             console.log(newRecord)
             setRecords((record)=>[...record, newRecord])
             setMsg("Records Saved!")
         }
         else {
-            console.log("not inside")
             setMsg("Error in Saving!")}
          
         
     }else{
         const resp = await axios.patch(`http://localhost:8080/teach/${wordObj.engId}`, wordObj)
-        records.map((record)=>{            
-                if(record.eng_id===wordObj.engId){
-                    return{
-                        ...record,
-                        eng_word: wordObj.engWord,
-                        fin_word: wordObj.finWord,
-                        name: wordObj.category,
-                    }
-                }           
-        })
-        /*setRecords((record)=>[...record, {eng_word: wordObj.engWord,
-            fin_word: wordObj.finWord,
-            name: wordObj.category,
-            engId:wordObj.engId,
-            finId:wordObj.engId
-        }])*/
+        console.log(wordObj)
+        setRecords(records.map(record=>{
+            if(record.eng_id===wordObj.engId){
+                return({...record,
+                    eng_word:wordObj.engWord,
+                    fin_word: wordObj.finWord,
+                    cat_id: Number(wordObj.category),
+                    eng_Id:Number(wordObj.engId), 
+                    fin_Id:Number(wordObj.finId) ,
+                    name:category_name})
+                };
+                return record
+            }))
         setToggleSubmit(true)
         setMsg(resp.data) 
     }
@@ -93,8 +90,10 @@ const Teach = ()=>{
             engId:"",
             finId:""})
   }
+  //record.name:"Colors"
   const editItem = (record)=>{
         console.log(record)
+        console.log(record.cat_id)
         setToggleSubmit(false);
         setWordObj({...wordObj, 
             engWord: record.eng_word, 
@@ -166,7 +165,7 @@ const Teach = ()=>{
                         </div>
                         <div>                           
                              <select
-                                    value={wordObj.category}
+                                    value={wordObj.category || ""}
                                     name="category"
                                     onChange={handleInput}>
                                 <option className="tag" value="">
