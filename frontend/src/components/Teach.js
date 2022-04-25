@@ -104,9 +104,12 @@ const Teach = ()=>{
             finId:record.fin_id})
          }
 
-  const removeItem = (engId, finId)=>{ 
-      console.log(engId, finId)
-
+  const removeItem = async (engId, finId)=>{ 
+      const resp = await axios.delete(`http://localhost:8080/teach?engId=${engId}&finId=${finId}`)
+      console.log(resp)
+      setRecords(records.filter((record)=>record.eng_Id!==engId && record.fin_id!==finId))
+      
+      setMsg(resp.data)
   }
 
    async function getData(){
