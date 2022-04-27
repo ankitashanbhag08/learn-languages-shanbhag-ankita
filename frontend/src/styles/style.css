@@ -1,0 +1,18 @@
+.learn-container{
+    margin-top: 15vh;
+}
+
+.teach-container {
+    margin-top: 15vh;
+    margin-left: auto;
+}
+
+.form-fields{
+    display: flex;
+}
+.table-header{
+    background-color: rgb(77, 77, 231);
+    font-weight: bold;
+    color: white;
+    text-align: center;
+}
