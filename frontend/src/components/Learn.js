@@ -58,11 +58,19 @@ const Learn = () => {
   },[])  
   return (
    
-    <Paper sx={{ width: '80%', margin: 'auto', marginTop: '25vh' }}>
-      <h3>Learn the words for test</h3>
+    <Paper sx={{ width: '80%', margin: 'auto', marginTop: '18vh' }}>
+      <h3 className='learn-header'>Learn words and take the test</h3>
+      <div>
+        <input
+            className="search-box-learn"
+            type="text"
+            placeholder="Search Here"
+            onChange={(event) => setQuery(event.target.value)}
+        />
+      </div>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label="sticky table">
-          <TableHead sx={{background:"#063970"}}>            
+          <TableHead>            
             <TableRow>
                 <StyledTableCell align="center">English Word</StyledTableCell>
                 <StyledTableCell align="center">Finnish Word</StyledTableCell>
@@ -70,7 +78,16 @@ const Learn = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {records
+            {records.filter(record=>{  
+                        record.name = (record.name!==null) ?  record.name  : ""                   
+                            if(query===""){
+                            return record
+                            }else if(record.eng_word.toLowerCase().includes(query.toLowerCase()) ||
+                                     record.fin_word.toLowerCase().includes(query.toLowerCase()) ||
+                                     record.name.toLowerCase().includes(query.toLowerCase())){
+                                return record
+                            }else return null
+                })
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((record) => {
                 return (
@@ -78,7 +95,7 @@ const Learn = () => {
                         <StyledTableCell align="center">{record.eng_word}</StyledTableCell>
                         <StyledTableCell align="center">{record.fin_word}</StyledTableCell>
                         <StyledTableCell align="center">{record.name}</StyledTableCell>
-                    </StyledTableRow>
+                  </StyledTableRow>
                 );
               })}
           </TableBody>
