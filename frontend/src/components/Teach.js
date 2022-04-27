@@ -11,7 +11,10 @@ import {Table,
     TableContainer,
     TableHead,
     TableRow, 
-    Paper} from '@mui/material';
+    Paper,
+    TablePagination,
+    TableFooter} from '@mui/material';
+
 //import { makeStyles } from '@mui/styles';
 
 const axios = require('axios')
@@ -41,9 +44,19 @@ const Teach = ()=>{
     finId:"",
     catId:""
   });
-  const [ids, setIds] = useState({
-      eng:"", fin:"", tag:""
-  })
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [recordSize, setRecordSize] = useState(0);
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+      
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+  
   const [toggleSubmit, setToggleSubmit] = useState(true);
   const [query, setQuery] = useState("");
   const [records, setRecords] = useState([])
@@ -84,6 +97,7 @@ const Teach = ()=>{
             name:category_name}
             console.log(newRecord)
             setRecords((record)=>[...record, newRecord])
+            setRecordSize(recordSize+1)
             setMsg("Records Saved!")
         }
         else {
@@ -132,7 +146,7 @@ const Teach = ()=>{
       const resp = await axios.delete(`http://localhost:8080/teach?engId=${engId}&finId=${finId}`)
       console.log(resp)
       setRecords(records.filter((record)=>record.eng_Id!==engId && record.fin_id!==finId))
-      
+      setRecordSize(recordSize-1)
       setMsg(resp.data)
   }
 
@@ -142,6 +156,7 @@ const Teach = ()=>{
       let hrData = await axios.get('http://localhost:8080/teach');
       console.log(hrData.data)
       setRecords(hrData.data);
+      setRecordSize(hrData.data.length)
     }  
    useEffect(()=>{   
     
@@ -222,7 +237,6 @@ const Teach = ()=>{
                     </div>
                 </form>
             </div>
-            <div>
                 <div>
                     <input
                             className="search-box"
@@ -231,7 +245,6 @@ const Teach = ()=>{
                             onChange={(event) => setQuery(event.target.value)}
                         />
                 </div>                        
-                        
                 <TableContainer sx={{maxWidth: 950, borderRadius: 5, margin: 'auto' }} component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
@@ -252,6 +265,7 @@ const Teach = ()=>{
                                 return record
                             }else return null
                     })
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((record,index) => (
                         <TableRow
                         key={index}
@@ -278,11 +292,22 @@ const Teach = ()=>{
                         </TableRow>
                     ))}
                     </TableBody>
+                   
+                        <TableFooter>
+                        <TablePagination 
+                            rowsPerPageOptions={[5,10,15, { value: -1, label: 'All' }]}
+                            count={recordSize}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
+                    </TableFooter>
+                    
+                    
                 </Table>
-                </TableContainer>
+                </TableContainer>              
                 
-                
-            </div>
             
         </div>  
         </>
