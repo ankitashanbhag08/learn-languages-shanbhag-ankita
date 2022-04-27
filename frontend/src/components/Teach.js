@@ -5,8 +5,32 @@ import {
   faTrashAlt,
   faEdit,
 } from "@fortawesome/free-solid-svg-icons";
+import {Table, 
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow, 
+    Paper} from '@mui/material';
+//import { makeStyles } from '@mui/styles';
 
 const axios = require('axios')
+
+/*const useStyles = makeStyles((theme)=>({
+    table:{
+        minWidth: 650
+    },
+    tableContainer:{
+        borderRadius: 15,
+        margin: '10px 10px',
+        maxWidth: 950
+    },
+    tableHeaderCell:{
+        fontWeight: 'bold',
+        backgroundColor: theme.palette.primary.dark,
+        color: theme.palette.getContrast(theme.palette.primary.dark)
+    }
+}))*/
 
 const Teach = ()=>{
   const [wordObj, setWordObj] = useState({
@@ -25,7 +49,8 @@ const Teach = ()=>{
   const [records, setRecords] = useState([])
   const [allTags, setAllTags] = useState([])
   const [msg, setMsg] = useState("")
-  
+  //const classes = useStyles();
+
   const handleInput = (event)=>{
     const name = event.target.name;
     const value = event.target.value;
@@ -124,7 +149,7 @@ const Teach = ()=>{
       
   },[])
   
-    return(
+      return(
         <>
         <div className="teach-container">
             <h1>Teach here</h1>
@@ -198,27 +223,26 @@ const Teach = ()=>{
                 </form>
             </div>
             <div>
-                <table>
-                    <tbody>
-                    <tr>
-                        <th colSpan="4">
-                        <input
+                <div>
+                    <input
                             className="search-box"
                             type="text"
                             placeholder="Search Here"
                             onChange={(event) => setQuery(event.target.value)}
                         />
-                        </th>
-                    </tr>
-                    </tbody>
-                    <tbody>
-                        <tr>
-                            <td>English Word</td>
-                            <td>Finish Word</td>
-                            <td>Category</td>
-                            <td>Action</td>
-                        </tr>
-                    </tbody>
+                </div>                        
+                        
+                <TableContainer sx={{maxWidth: 950, borderRadius: 5, margin: 'auto' }} component={Paper}>
+                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableHead>
+                    <TableRow>
+                        <TableCell className="table-header" align="center">English Word</TableCell>
+                        <TableCell className="table-header" align="center">Finnish Word</TableCell>
+                        <TableCell className="table-header" align="center">Category</TableCell>
+                        <TableCell className="table-header" align="center">Action</TableCell>
+                    </TableRow>
+                    </TableHead>
+                    <TableBody>
                     {records.filter(record=>{                       
                             if(query===""){
                             return record
@@ -228,33 +252,35 @@ const Teach = ()=>{
                                 return record
                             }else return null
                     })
-                    
-                    .map((record, index)=>{
-                        return(<tbody key = {index}>
-                        <tr>
-                            <td>{record.eng_word}</td>
-                            <td>{record.fin_word}</td>
-                            <td>{record.name}</td>
-                            <td>
-                                <FontAwesomeIcon
-                                className="icons delete"
-                                icon={faTrashAlt}
-                                title="Delete Item"
-                                onClick={() => removeItem(record.eng_id, record.fin_id)}
-                              />
+                    .map((record,index) => (
+                        <TableRow
+                        key={index}
+                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                        >
+                        <TableCell align="center">{record.eng_word}</TableCell>
+                        <TableCell align="center">{record.fin_word}</TableCell>
+                        <TableCell align="center">{record.name}</TableCell>
+                        <TableCell align="center">
+                            <FontAwesomeIcon
+                                    className="icons delete"
+                                    icon={faTrashAlt}
+                                    title="Delete Item"
+                                    onClick={() => removeItem(record.eng_id, record.fin_id)}
+                                />
 
-                              <FontAwesomeIcon
-                                className="icons edit"
-                                icon={faEdit}
-                                title="Edit Item"
-                                onClick={() => editItem(record)}
-                              />
-                            </td>
-                        </tr>
-                    </tbody>)
-                    })}
-                    
-                </table>
+                                <FontAwesomeIcon
+                                    className="icons edit"
+                                    icon={faEdit}
+                                    title="Edit Item"
+                                    onClick={() => editItem(record)}
+                                />
+                        </TableCell>
+                        </TableRow>
+                    ))}
+                    </TableBody>
+                </Table>
+                </TableContainer>
+                
                 
             </div>
             
