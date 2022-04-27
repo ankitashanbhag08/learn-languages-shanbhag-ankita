@@ -15,25 +15,7 @@ import {Table,
     TablePagination,
     TableFooter} from '@mui/material';
 
-//import { makeStyles } from '@mui/styles';
-
 const axios = require('axios')
-
-/*const useStyles = makeStyles((theme)=>({
-    table:{
-        minWidth: 650
-    },
-    tableContainer:{
-        borderRadius: 15,
-        margin: '10px 10px',
-        maxWidth: 950
-    },
-    tableHeaderCell:{
-        fontWeight: 'bold',
-        backgroundColor: theme.palette.primary.dark,
-        color: theme.palette.getContrast(theme.palette.primary.dark)
-    }
-}))*/
 
 const Teach = ()=>{
   const [wordObj, setWordObj] = useState({
@@ -167,7 +149,7 @@ const Teach = ()=>{
       return(
         <>
         <div className="teach-container">
-            <h1>Teach here</h1>
+            <h2>Add Words</h2>
             <div>
                 <form>
                     <div>
@@ -276,7 +258,7 @@ const Teach = ()=>{
                         <TableCell align="center">{record.fin_word}</TableCell>
                         <TableCell align="center">{record.name}</TableCell>
                         <TableCell align="center">
-                            <FontAwesomeIcon
+                                <FontAwesomeIcon
                                     className="icons delete"
                                     icon={faTrashAlt}
                                     title="Delete Item"
@@ -297,6 +279,7 @@ const Teach = ()=>{
                         <TableFooter>
                         <TablePagination 
                             rowsPerPageOptions={[5,10,15, { value: -1, label: 'All' }]}
+                            component={TableCell}
                             count={recordSize}
                             rowsPerPage={rowsPerPage}
                             page={page}
