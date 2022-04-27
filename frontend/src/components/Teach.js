@@ -1,10 +1,7 @@
 import React, {useState, useEffect} from "react";
 import '../styles/style.css'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faTrashAlt,
-  faEdit,
-} from "@fortawesome/free-solid-svg-icons";
+import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import {Table, 
     TableBody,
     TableCell,
@@ -227,16 +224,14 @@ const Teach = ()=>{
                         <TableCell align="center">{record.fin_word}</TableCell>
                         <TableCell align="center">{record.name}</TableCell>
                         <TableCell align="center">
-                                <FontAwesomeIcon
+                                <DeleteTwoToneIcon
                                     className="icons delete"
-                                    icon={faTrashAlt}
                                     title="Delete Item"
                                     onClick={() => removeItem(record.eng_id, record.fin_id)}
                                 />
 
-                                <FontAwesomeIcon
+                                <EditTwoToneIcon
                                     className="icons edit"
-                                    icon={faEdit}
                                     title="Edit Item"
                                     onClick={() => editItem(record)}
                                 />
