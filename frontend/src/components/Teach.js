@@ -14,7 +14,7 @@ import {Table,
     Paper,
     TablePagination,
     TableFooter} from '@mui/material';
-import {Box, TextField, MenuItem} from '@mui/material';
+import {Box, TextField, MenuItem, Button, Stack} from '@mui/material';
 
 const axios = require('axios')
 
@@ -150,6 +150,7 @@ const Teach = ()=>{
       return(
         <>
         <div className="teach-container">
+            <h2>Add Words Here</h2>
             <Box
             component="form"
                 sx={{
@@ -159,14 +160,14 @@ const Teach = ()=>{
             >
                 <TextField id="engWord" name="engWord" value={wordObj.engWord} onChange={handleInput} label="English Word" variant="outlined" required />
                 <TextField id="finWord" name="finWord" value={wordObj.finWord} onChange={handleInput} label="Finnish Word" variant="outlined" required />
-                 <TextField
+                <TextField
                     id="outlined-select-currency"
                     select
                     label="Category"
                     value={wordObj.category || ""}
                     name="category"
                     onChange={handleInput}
-                    helperText="Please select your currency"
+                    helperText="Please select a category"
                     >
                     {allTags.map((tag) => (
                         <MenuItem key={tag.id} value={tag.id}> 
@@ -175,26 +176,18 @@ const Teach = ()=>{
                     ))}
                 </TextField>
             </Box>
-            <h2>Add Words</h2>
-            <div>
-                <form>
-                    <div>
-                                              
-                       
-                        
-                        <div className="form-buttons">
-                            {toggleSubmit ? 
-                                (<button onClick={handleSubmit}>Create</button>) :
-                                <button onClick={handleSubmit}>Edit</button>
-                            }
-                            <button onClick={handleReset}>Reset</button>
-                        </div>
-                    </div>
-                    <div>
+            <div className="create-messages">
                         {msg}
-                    </div>
-                </form>
             </div>
+            <Stack spacing={3} direction="row" sx={{marginLeft:'30rem'}}>
+                {toggleSubmit ? 
+                    (<Button variant="contained" onClick={handleSubmit}>Create</Button>) :
+                      <Button variant="contained" onClick={handleSubmit}>Edit</Button>
+                }
+                 <Button variant="contained" onClick={handleReset}>Reset</Button>
+            </Stack>
+            
+                    
                 <div>
                     <input
                             className="search-box"
