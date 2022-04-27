@@ -14,6 +14,7 @@ import {Table,
     Paper,
     TablePagination,
     TableFooter} from '@mui/material';
+import {Box, TextField, MenuItem} from '@mui/material';
 
 const axios = require('axios')
 
@@ -149,63 +150,38 @@ const Teach = ()=>{
       return(
         <>
         <div className="teach-container">
+            <Box
+            component="form"
+                sx={{
+                    '& > :not(style)': { m: 1, width: '25ch' },
+                    marginLeft:'12rem'
+                }}
+            >
+                <TextField id="engWord" name="engWord" value={wordObj.engWord} onChange={handleInput} label="English Word" variant="outlined" required />
+                <TextField id="finWord" name="finWord" value={wordObj.finWord} onChange={handleInput} label="Finnish Word" variant="outlined" required />
+                 <TextField
+                    id="outlined-select-currency"
+                    select
+                    label="Category"
+                    value={wordObj.category || ""}
+                    name="category"
+                    onChange={handleInput}
+                    helperText="Please select your currency"
+                    >
+                    {allTags.map((tag) => (
+                        <MenuItem key={tag.id} value={tag.id}> 
+                        {tag.NAME}
+                        </MenuItem>
+                    ))}
+                </TextField>
+            </Box>
             <h2>Add Words</h2>
             <div>
                 <form>
                     <div>
-                        <div>
-                            <div className="form-fields">
-                            <label htmlFor="engWord">English Word</label>
-                            </div>
-                            <div>                           
-                                <input
-                                    type="text"
-                                    name="engWord"
-                                    id="engWord"
-                                    value={wordObj.engWord}
-                                    onChange={handleInput}
-                                    required>
-                                </input>            
-                            </div>
-                        </div>
+                                              
+                       
                         
-                        <div>
-                            <label htmlFor="finWord">Finnish Word</label>
-                        </div>
-                        <div>                           
-                            <input
-                                type="text"
-                                name="finWord"
-                                id="finWord"
-                                value={wordObj.finWord}
-                                onChange={handleInput}
-                                required>
-                            </input>            
-                        </div>
-                        <div>
-                            <label htmlFor="category">Category</label>
-                        </div>
-                        <div>                           
-                             <select
-                                    value={wordObj.category || ""}
-                                    name="category"
-                                    onChange={handleInput}>
-                                <option className="tag" value="">
-                                ==Select==
-                                </option>
-                                {allTags.map((tag) => (
-                                <option
-                                    key={tag.id}
-                                    onChange={handleInput}
-                                    className="tag"
-                                    name="category"
-                                    id="category"
-                                    value={tag.id}>
-                                    {tag.NAME}
-                                </option>
-                                ))}
-                            </select>       
-                        </div>
                         <div className="form-buttons">
                             {toggleSubmit ? 
                                 (<button onClick={handleSubmit}>Create</button>) :
