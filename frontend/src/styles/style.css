@@ -16,3 +16,11 @@
     color: white;
     text-align: center;
 }
+.search-box{
+    width: 500px;
+    padding: 5px;
+    margin-left:39rem;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    
+}
