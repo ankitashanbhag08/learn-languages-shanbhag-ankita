@@ -256,12 +256,13 @@ const Teach = ()=>{
                     </TableRow>
                     </TableHead>
                     <TableBody>
-                    {records.filter(record=>{                       
+                    {records.filter(record=>{  
+                        record.name = (record.name!==null) ?  record.name  : ""                   
                             if(query===""){
                             return record
-                            }else if(record.eng_word.toLowerCase().includes(query.toLocaleLowerCase()) ||
-                                     record.fin_word.toLowerCase().includes(query.toLocaleLowerCase()) ||
-                                     record.name.toLowerCase().includes(query.toLocaleLowerCase())){
+                            }else if(record.eng_word.toLowerCase().includes(query.toLowerCase()) ||
+                                     record.fin_word.toLowerCase().includes(query.toLowerCase()) ||
+                                     record.name.toLowerCase().includes(query.toLowerCase())){
                                 return record
                             }else return null
                     })
