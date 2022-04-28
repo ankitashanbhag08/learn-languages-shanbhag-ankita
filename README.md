@@ -3,7 +3,7 @@
 This is full stack application that helps students to learn forign language grammar. The teacher can add, update, delete the words and their meaning.
 Students can learn these words and then take a test, after which they will get a score.
 
-## Database Table Structure
+## Database Structure
 
 The application uses MySQL Database. Run the following statements on the database server to create table.
 
@@ -80,4 +80,4 @@ INSERT INTO category_master (name) VALUES ("COLORS");
    ```
    nodemon index.js
    ```
-6. You can now access the [application] (http://localhost:8080/)
+6. You can now access the [application](http://localhost:8080/)
