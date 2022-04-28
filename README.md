@@ -52,3 +52,32 @@ There are categories (optional) for the words that the teacher adds. You can ins
 INSERT INTO category_master (name) VALUES ("ANIMALS");
 INSERT INTO category_master (name) VALUES ("COLORS");
 ```
+
+## Deploying the Application
+
+1. Clone the github repository
+   ```
+   git clone https://github.com/ankitashanbhag08/learn-languages-shanbhag-ankita.git
+   ```
+2. On you cygwin terminal, navigate to the root folder and install the dependencies.
+   ```
+   cd learn-languages-shanbhag-ankita
+   npm install
+   ```
+3. On you cygwin terminal, navigate to the learn-languages-shanbhag-ankita/frontend folder and install the dependencies.
+   ```
+   cd frontend
+   npm install
+   ```
+4. Add a .env file in folder "learn-languages-shanbhag-ankita" (in the root folder). Add the following parameters corresponding to your database.
+   ```
+   DB_HOST =
+   DB_USER =
+   DB_PASSWORD =
+   DB_DB =
+   ```
+5. In the cygwin terminal, make sure that you are inside the folder "learn-languages-shanbhag-ankita". Start the backend server
+   ```
+   nodemon index.js
+   ```
+6. You can now access the [application] (http://localhost:8080/)
