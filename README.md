@@ -81,3 +81,7 @@ INSERT INTO category_master (name) VALUES ("COLORS");
    nodemon index.js
    ```
 6. You can now access the [application](http://localhost:8080/)
+
+The links mentioned in front end components are relative. If you want to access the frontend directly make the links absolute in Teach.js and Learn.js. i.e. replace /teach with http://localhost:8080/teach.js and so on.
+
+## Screenshots
