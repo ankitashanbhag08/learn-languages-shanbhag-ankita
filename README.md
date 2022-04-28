@@ -108,7 +108,7 @@ The table also has pagination facility.
 
 ## Release Information
 
-2022-04-29 1.0 released: Learn Tab and Teach Tab.
+2022-04-29 1.0.0 released: Learn Tab and Teach Tab.
 
 ## Next Steps
 
