@@ -11,6 +11,7 @@ import {Paper,
 
 const axios = require('axios')
 
+//Styles Table Cells (header and body)
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -20,7 +21,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
   },
 }));
-
+//Styles Table Cells - gives alternate color to rows.
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.action.hover,
@@ -32,6 +33,12 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const Learn = () => {
+  //hook for records from the database.
+  const [records, setRecords] = useState([])
+  //hook for search bar
+  const [query, setQuery] = useState("");  
+
+  //hooks for pagination
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [recordSize, setRecordSize] = useState(0);
@@ -43,15 +50,14 @@ const Learn = () => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-  const [query, setQuery] = useState("");
-  const [records, setRecords] = useState([])
-
+  
    async function getData(){
-      let hr = await axios.get('http://localhost:8080/teach');
+      let hr = await axios.get('/teach');
       console.log(hr.data)
       setRecords(hr.data);
       setRecordSize(hr.data.length)
-    }  
+    } 
+   //Called when the page is loaded  
    useEffect(()=>{  
       getData();
       
@@ -78,7 +84,10 @@ const Learn = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {records.filter(record=>{  
+             {records.filter(record=>{  
+                        /*FIX: To prevent NULL Pointer Exception.
+                        record.name means category. If category is NULL, then returns an empty string.
+                        Filters records based upon the string typed in Search bar.*/
                         record.name = (record.name!==null) ?  record.name  : ""                   
                             if(query===""){
                             return record
@@ -88,7 +97,9 @@ const Learn = () => {
                                 return record
                             }else return null
                 })
+                //Determines rows per page.
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              //Iterates through the records and displays word, its translation and category(if any) within the table.
               .map((record) => {
                 return (
                   <StyledTableRow key={record.eng_id}>
