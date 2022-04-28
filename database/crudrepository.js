@@ -117,11 +117,11 @@ let connectionFunctions = {
             const sql3 = "DELETE FROM word_meaning where eng_id = ? AND fin_id = ?"
             try{
                 await connection.beginTransaction();
+                await execQuery(sql3, [engId, finId])
                 await execQuery(sql1, [engId])      
                 console.log(sql1)
-                await execQuery(sql2, [finId])
-                
-                await execQuery(sql3, [engId, finId])                
+                await execQuery(sql2, [finId])              
+                                
                 await connection.commit();
                 recordDeleted=true
                 return(recordDeleted)
