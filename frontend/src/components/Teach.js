@@ -84,8 +84,8 @@ const Teach = ()=>{
             let newRecord = {eng_word: wordObj.engWord,
             fin_word: wordObj.finWord,
             cat_id: Number(wordObj.category),
-            eng_Id:resp.data.engId,
-            fin_Id:resp.data.finId,
+            eng_id:resp.data.engId,
+            fin_id:resp.data.finId,
             name:category_name}
             console.log(newRecord)
             //updates current records and adds new record.
@@ -108,8 +108,8 @@ const Teach = ()=>{
                     eng_word:wordObj.engWord,
                     fin_word: wordObj.finWord,
                     cat_id: Number(wordObj.category),
-                    eng_Id:Number(wordObj.engId), 
-                    fin_Id:Number(wordObj.finId) ,
+                    eng_id:Number(wordObj.engId), 
+                    fin_id:Number(wordObj.finId) ,
                     name:category_name})
                 };
                 return record
@@ -138,11 +138,11 @@ const Teach = ()=>{
             finId:record.fin_id})
          }
   //Called when you click on Delete icon.
-  const removeItem = async (engId, finId)=>{ 
+  const removeItem = async (engId, finId)=>{
       const resp = await axios.delete(`/teach?engId=${engId}&finId=${finId}`)
       console.log(resp)
       //remove the current record from set of records
-      setRecords(records.filter((record)=>record.eng_Id!==engId && record.fin_id!==finId))
+      setRecords(records.filter((record)=>record.eng_id!==engId && record.fin_id!==finId))
       //Decrease the record size
       setRecordSize(recordSize-1)
       setMsg(resp.data)
@@ -250,7 +250,7 @@ const Teach = ()=>{
                                 <DeleteTwoToneIcon
                                     className="icons delete"
                                     title="Delete Item"
-                                    onClick={() => removeItem(record.eng_id, record.fin_id)}
+                                    onClick={() => removeItem(record.eng_id,record.fin_id)}
                                 />
 
                                 <EditTwoToneIcon
