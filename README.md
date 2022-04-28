@@ -5,7 +5,7 @@ Students can learn these words and then take a test, after which they will get a
 
 ## Database Table Structure
 
-The application uses MySQL Database. Run the following statements on the database server.
+The application uses MySQL Database. Run the following statements on the database server to create table.
 
 ```
 CREATE TABLE category_master(
@@ -17,7 +17,7 @@ NAME VARCHAR(100)
 ```
 CREATE TABLE eng_word_master(
 id INT AUTO_INCREMENT PRIMARY KEY,
-word VARCHAR(100),
+word VARCHAR(100) NOT NULL,
 category_id INT,
 FOREIGN KEY(category_id) REFERENCES category_master(id)
 ON DELETE SET NULL ON UPDATE CASCADE
@@ -44,4 +44,11 @@ ON DELETE SET NULL ON UPDATE CASCADE,
 FOREIGN KEY(fin_id) REFERENCES fin_word_master(id)
 ON DELETE SET NULL ON UPDATE CASCADE
 );
+```
+
+There are categories (optional) for the words that the teacher adds. You can insert some sample categories in the table category_master. Run the following statement.
+
+```
+INSERT INTO category_master (name) VALUES ("ANIMALS");
+INSERT INTO category_master (name) VALUES ("COLORS");
 ```
