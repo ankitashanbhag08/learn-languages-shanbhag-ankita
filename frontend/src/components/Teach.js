@@ -16,6 +16,7 @@ import {Box, TextField, MenuItem, Button, Stack} from '@mui/material';
 const axios = require('axios')
 
 const Teach = ()=>{
+  //Stores value from the text fields.
   const [wordObj, setWordObj] = useState({
     engWord: "",
     finWord: "",
@@ -24,32 +25,36 @@ const Teach = ()=>{
     finId:"",
     catId:""
   });
+  //Determines Edit or Submit 
+  const [toggleSubmit, setToggleSubmit] = useState(true);
+  //hook for search bar
+  const [query, setQuery] = useState("");
+  //hook for records from the database.
+  const [records, setRecords] = useState([])
+  //hook for all categories.
+  const [allTags, setAllTags] = useState([])
+  const [msg, setMsg] = useState("")
+  //hooks for pagination.
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [recordSize, setRecordSize] = useState(0);
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event) => {
-      
+  const handleChangeRowsPerPage = (event) => {      
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-  
-  const [toggleSubmit, setToggleSubmit] = useState(true);
-  const [query, setQuery] = useState("");
-  const [records, setRecords] = useState([])
-  const [allTags, setAllTags] = useState([])
-  const [msg, setMsg] = useState("")
-  //const classes = useStyles();
-
+//Called when value is changed in any of the text fields 
   const handleInput = (event)=>{
     const name = event.target.name;
     const value = event.target.value;
     console.log(`${name} : ${value}`)
     setWordObj({...wordObj, [name]:value})
   }
+//Called when Reset button is clicked
   const handleReset = (event)=>{
     event.preventDefault();
     setWordObj({engWord: "",
@@ -59,15 +64,22 @@ const Teach = ()=>{
     finId:"",
     catId:""})
   }
+
+  //Called when Edit/Submit is clicked
   const handleSubmit = async (event)=>{
       event.preventDefault();
+      if(wordObj.engWord==="" || wordObj.finWord==="") {
+          setMsg("Fill the mandatory fields")
+          return false
+      }
+      //FIX: To display Category name, instead of category id (in the table)
       let category_name=""
       let tagObj = allTags.find((tag)=>tag.id===Number(wordObj.category))
       category_name = tagObj ? tagObj.NAME : category_name
+    //When submit is clicked - add new records in database
     if(toggleSubmit){        
-        const resp = await axios.post('http://localhost:8080/teach', wordObj)
+        const resp = await axios.post('/teach', wordObj)
         if(resp.data.engId && resp.data.engId){
-            console.log("inside")
             console.log(resp)
             let newRecord = {eng_word: wordObj.engWord,
             fin_word: wordObj.finWord,
@@ -76,7 +88,9 @@ const Teach = ()=>{
             fin_Id:resp.data.finId,
             name:category_name}
             console.log(newRecord)
+            //updates current records and adds new record.
             setRecords((record)=>[...record, newRecord])
+            //increase the record size
             setRecordSize(recordSize+1)
             setMsg("Records Saved!")
         }
@@ -85,7 +99,8 @@ const Teach = ()=>{
          
         
     }else{
-        const resp = await axios.patch(`http://localhost:8080/teach/${wordObj.engId}`, wordObj)
+        //When Edit Button is clicked.
+        const resp = await axios.patch(`/teach/${wordObj.engId}`, wordObj)
         console.log(wordObj)
         setRecords(records.map(record=>{
             if(record.eng_id===wordObj.engId){
@@ -109,7 +124,8 @@ const Teach = ()=>{
             engId:"",
             finId:""})
   }
-  //record.name:"Colors"
+  //record.name:"Colors", record.name:integer
+  //Called when you click on edit icon.
   const editItem = (record)=>{
         console.log(record)
         console.log(record.cat_id)
@@ -121,28 +137,29 @@ const Teach = ()=>{
             engId:record.eng_id,
             finId:record.fin_id})
          }
-
+  //Called when you click on Delete icon.
   const removeItem = async (engId, finId)=>{ 
-      const resp = await axios.delete(`http://localhost:8080/teach?engId=${engId}&finId=${finId}`)
+      const resp = await axios.delete(`/teach?engId=${engId}&finId=${finId}`)
       console.log(resp)
+      //remove the current record from set of records
       setRecords(records.filter((record)=>record.eng_Id!==engId && record.fin_id!==finId))
+      //Decrease the record size
       setRecordSize(recordSize-1)
       setMsg(resp.data)
   }
 
    async function getData(){
-      let hr = await axios.get('http://localhost:8080/tags');
+      let hr = await axios.get('/teach/tags');
       setAllTags(hr.data);
-      let hrData = await axios.get('http://localhost:8080/teach');
+      let hrData = await axios.get('/teach');
       console.log(hrData.data)
       setRecords(hrData.data);
       setRecordSize(hrData.data.length)
     }  
-   useEffect(()=>{   
-    
-      getData();
-      
-  },[])
+   //Called when page is loaded
+   useEffect(()=>{
+       getData();
+    },[])
   
       return(
         <>
@@ -152,8 +169,9 @@ const Teach = ()=>{
             component="form"
                 sx={{
                     '& > :not(style)': { m: 1, width: '25ch' },
-                    marginLeft:'12rem'
+                    marginLeft:'22rem'
                 }}
+                
             >
                 <TextField id="engWord" name="engWord" value={wordObj.engWord} onChange={handleInput} label="English Word" variant="outlined" required />
                 <TextField id="finWord" name="finWord" value={wordObj.finWord} onChange={handleInput} label="Finnish Word" variant="outlined" required />
@@ -176,7 +194,7 @@ const Teach = ()=>{
             <div className="create-messages">
                         {msg}
             </div>
-            <Stack spacing={3} direction="row" sx={{marginLeft:'30rem'}}>
+            <Stack spacing={3} direction="row" sx={{marginLeft:'35rem'}}>
                 {toggleSubmit ? 
                     (<Button variant="contained" onClick={handleSubmit}>Create</Button>) :
                       <Button variant="contained" onClick={handleSubmit}>Edit</Button>
@@ -204,7 +222,10 @@ const Teach = ()=>{
                     </TableRow>
                     </TableHead>
                     <TableBody>
-                    {records.filter(record=>{  
+                    {records.filter(record=>{ 
+                         /*FIX: To prevent NULL Pointer Exception.
+                        record.name means category. If category is NULL, then returns an empty string.
+                        Filters records based upon the string typed in Search bar.*/ 
                         record.name = (record.name!==null) ?  record.name  : ""                   
                             if(query===""){
                             return record
@@ -214,7 +235,9 @@ const Teach = ()=>{
                                 return record
                             }else return null
                     })
+                        //Determines rows per page.
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        //Iterates through the records and displays word, its translation and category(if any) within the table.
                     .map((record,index) => (
                         <TableRow
                         key={index}
@@ -238,25 +261,22 @@ const Teach = ()=>{
                         </TableCell>
                         </TableRow>
                     ))}
-                    </TableBody>
-                   
+                    </TableBody>                   
                         <TableFooter>
-                        <TablePagination 
-                            rowsPerPageOptions={[5,10,15, { value: -1, label: 'All' }]}
-                            component={TableCell}
-                            count={recordSize}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                        />
-                    </TableFooter>
-                    
-                    
+                            <TableRow>
+                                <TablePagination 
+                                    rowsPerPageOptions={[5,10,15, { value: -1, label: 'All' }]}
+                                    component={TableCell}
+                                    count={recordSize}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                />
+                            </TableRow>                        
+                        </TableFooter>                
                 </Table>
                 </TableContainer>              
-                
-            
         </div>  
         </>
     )
