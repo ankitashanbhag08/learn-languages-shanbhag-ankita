@@ -1,7 +1,20 @@
+/*Styles for Learn.js (Learn Tab)*/
 .learn-container{
     margin-left: 6rem;
 }
+.learn-header {
+    text-align: center;
+    padding-top: 10px;
+}
 
+.search-box-learn {
+    width: 500px;
+    padding: 5px;
+    margin-left: 30rem;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+/*Styles for Teach.js (Teach Tab)*/
 .teach-container {
     margin-top: 18vh;
     margin-left: auto;
@@ -30,17 +43,6 @@
 .create-messages{
     color:red;
     margin:auto;
-    margin-left:30rem;
+    margin-left:35rem;
     margin-bottom:10px
-}
-.learn-header{
-    text-align: center;
-    padding-top: 10px;
-}
-.search-box-learn{
-    width: 500px;
-    padding: 5px;
-    margin-left:30rem;
-    margin-bottom: 15px;
-    border-radius: 5px;
 }
