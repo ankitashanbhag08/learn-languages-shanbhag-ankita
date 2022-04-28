@@ -3,14 +3,16 @@ const mysql = require('mysql');
 const { NULL } = require('mysql/lib/protocol/constants/types');
 
 var connection = mysql.createConnection({ 
- connectionLimit : 10,
+ connectionLimit : 10,         //connection pool
  host: process.env.DB_HOST,
  user: process.env.DB_USER,
  password: process.env.DB_PASSWORD,
  database: process.env.DB_DB,
- multipleStatements: false
+ multipleStatements: false      //prevents SQL injection
 });
-const insertData = (query, params) => {
+
+//Takes sql statement and parameters and executes the query.
+const execQuery = (query, params) => {
     return new Promise((resolve, reject) =>{
         connection.query(query, params, (err, result) => {
             if (err)
@@ -26,8 +28,8 @@ let connectionFunctions = {
         connection.connect((err)=>{
             callback();
         });
-    },
-    
+    },    
+    //Returns all the categories
     findTags:()=>{
         let sql='SELECT * FROM category_master'
         console.log(sql)
@@ -38,6 +40,7 @@ let connectionFunctions = {
         })
         
     },
+    //Returns records of english words, finnish translated words, categories and corresponding ids.
     findAll: () =>{
         let sql = "SELECT eng_word_master.id as eng_id,eng_word_master.word as eng_word,fin_word_master.id AS fin_id,fin_word_master.word as fin_word, category_master.name, category_master.id as cat_id FROM eng_word_master" + 
                     " JOIN word_meaning ON eng_word_master.id = word_meaning.eng_id"+
@@ -52,19 +55,21 @@ let connectionFunctions = {
         
     },
 
+    /*Saves new word and its meaning and category into database. This is a transaction - even if 1 query fails to
+    execute, rollback will happen.*/
     save:async (newWord)=>{
             let category=null;
+            //If category is not given the insert NULL into category id.
             category = (newWord.category==="") ? category : newWord.category;
             const sql1 = "INSERT INTO eng_word_master (word, category_id) VALUES (?, ?)"
             const sql2 = "INSERT INTO fin_word_master (word, category_id) VALUES (?, ?)"
             const sql3 = "INSERT INTO word_meaning (eng_id, fin_id) VALUES (?, ?);"
             try{
                 await connection.beginTransaction();
-                let result1 = await insertData(sql1, [newWord.engWord, category])      
-                
-                let result2 = await insertData(sql2, [newWord.finWord, category])
-                
-                let result3 = await insertData(sql3, [result1.insertId, result2.insertId])                
+                let result1 = await execQuery(sql1, [newWord.engWord, category])     
+                let result2 = await execQuery(sql2, [newWord.finWord, category])
+                //inserts foreign keys(eng_id and fin_id) from above 2 queries
+                let result3 = await execQuery(sql3, [result1.insertId, result2.insertId])                
                 await connection.commit();
                 return({engId:result1.insertId, finId:result2.insertId})
             }catch(err){
@@ -73,12 +78,13 @@ let connectionFunctions = {
                 return("error!")                
             }   
     },
-    
+    /*Updates record in database. This is a transaction - even if 1 query fails to
+    execute, rollback will happen.*/
     update: async(word)=>{
          console.log(word)
          let category=null;
+         //If category is not given the insert category id id set tu NULL.
             category = (word.category==="") ? category : Number(word.category);
-         //let category = Number(word.category)
          let finId = Number(word.engId)
          let engId=Number(word.engId)
           
@@ -88,12 +94,11 @@ let connectionFunctions = {
         try{
                 await connection.beginTransaction();
                 console.log(word)
-                let result1 = await insertData(sql1, [word.engWord, category, engId])      
+                await execQuery(sql1, [word.engWord, category, engId])     
                 
-                let result2 = await insertData(sql2, [word.finWord, category, finId])
-                
-                //let result3 = await insertData(sql3, [result1.insertId, result2.insertId])                
+                await execQuery(sql2, [word.finWord, category, finId])
                 await connection.commit();
+                //Set this flag to true, if transaction is committed.
                 recordsUpdated=true;
                 return(recordsUpdated)
             }catch(err){
@@ -101,32 +106,22 @@ let connectionFunctions = {
                 console.log(err)
                 return("error!")                
             }  
-        //try{
-           // await connection.beginTransaction()
-           /* Promise.all([insertData(sql1, [word.engWord, word.category, word.engId]), insertData(sql2, [word.finWord, word.category, word.finId])])
-            .then((data) => console.log("done"))
-            .catch((err)=>console.log(err));*/
-           // await connection.commit();
-            
-       // }catch(err){
-        //    await connection.rollback();
-         //   console.log(err)
-         //   return("error!")
-       // }
+        
     },
+    //Delete word and it's meaning.
     delete:async (engId, finId)=>{
-        console.log("hello"  + engId)
+        console.log("English id"  + engId)
             let recordDeleted=false
             const sql1 = "DELETE FROM eng_word_master where id = ?"
             const sql2 = "DELETE FROM fin_word_master where id = ?"
             const sql3 = "DELETE FROM word_meaning where eng_id = ? AND fin_id = ?"
             try{
                 await connection.beginTransaction();
-                await insertData(sql1, [engId])      
+                await execQuery(sql1, [engId])      
                 console.log(sql1)
-                await insertData(sql2, [finId])
+                await execQuery(sql2, [finId])
                 
-                await insertData(sql3, [engId, finId])                
+                await execQuery(sql3, [engId, finId])                
                 await connection.commit();
                 recordDeleted=true
                 return(recordDeleted)
