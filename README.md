@@ -85,3 +85,40 @@ INSERT INTO category_master (name) VALUES ("COLORS");
 The links mentioned in front end components are relative. If you want to access the frontend directly make the links absolute in Teach.js and Learn.js. i.e. replace /teach with http://localhost:8080/teach.js and so on.
 
 ## Screenshots
+
+The "Learn Tab" displays list of all foreign words. The student can learn these words before taking a test.
+
+![Learn Words](/assets/images/displayLearn.png)
+
+Student can search any word/ forign word/category using search bar. The table also has pagination facility.
+
+![Search Words](/assets/images/search_pagination.png)
+
+A teacher can add new word through "Teach Tab". The category is optional.
+
+![Add Words](/assets/images/addWord.png)
+
+By clicking on icons under "Action" column, the teacher can edit or delete the words.
+
+![Edit Words](/assets/images/edit_del.jpg)
+
+The table also has pagination facility.
+
+![Pagination](/assets/images/rows.png)
+
+## Release Information
+
+2022-04-29 1.0 released: Learn Tab and Teach Tab.
+
+## Next Steps
+
+1. Developing "Take Test" Tab.
+2. Support for more languages.
+3. Dynamic Tags/Categories.
+4. Authentication
+
+## References
+
+[MUI App bar](https://mui.com/material-ui/react-app-bar/)
+[MUI Table](https://mui.com/material-ui/react-table/#main-content)
+[MUI Text field](https://mui.com/material-ui/react-text-field/#main-content)
