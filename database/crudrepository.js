@@ -20,7 +20,15 @@ const execQuery = (query, params) => {
             resolve(result);
         });
     });
+}
 
+//Object Literals
+function getTableName(type) {
+  var table = {
+    'English': 'eng_word_master',
+    'Finnish': 'fin_word_master'
+  };
+  return table[type]
 }
 
 let connectionFunctions = {
@@ -131,12 +139,38 @@ let connectionFunctions = {
                 return(recordDeleted)                
             }
     },
+
+    findQuestions: async (qstnsObj)=>{
+            const table = getTableName(qstnsObj.lang1);
+            const MAX_QSTN = 10;
+            let sql, catId
+            if(qstnsObj.catId!==""){
+                catId = Number(qstnsObj.catId)
+                sql = `SELECT id, word FROM ?? WHERE category_id = ?`
+                return new Promise((resolve, reject)=>{
+                connection.query(sql, [table, catId], (err, results)=>{
+                    err ? reject(err) : resolve(results)
+                })
+            })
+            }else{
+                sql = 'SELECT id, word FROM ?? ORDER BY RAND() LIMIT ?'
+                return new Promise((resolve, reject)=>{
+                connection.query(sql, [table, MAX_QSTN], (err, results)=>{
+                    err ? reject(err) : resolve(results)
+                })
+            })
+            }
+            
+        
+    },
+
     close: (callback)=>{
         connection.end(()=>{
             console.log("Closing db")
             callback();
         })
     }
+    
 }
 
 module.exports = connectionFunctions
