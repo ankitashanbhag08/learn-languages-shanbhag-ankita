@@ -15,6 +15,19 @@ router.get("/tags", async (req, resp)=>{
     }    
 });
 
+router.get("/qstns", async (req, resp)=>{
+    try{
+        console.log("getting questions")
+        let qstnsObj = req.query;
+        const results = await database.findQuestions(qstnsObj);
+        resp.send(results);
+    }catch(err){
+        console.log(err)
+        //500:Internal Server Error
+        resp.status(500).end();
+    }    
+});
+
 router.get("/", async (req, resp)=>{
     try{
         console.log("getting records")
