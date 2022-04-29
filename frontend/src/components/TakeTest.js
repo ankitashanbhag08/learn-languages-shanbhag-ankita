@@ -8,6 +8,7 @@ const TakeTest = ()=>{
     const languages = ["English", "Finnish"]
     const [langObj, setLangObj] = useState({lang1:"", lang2:"", category:""})
     const [allTags, setAllTags] = useState([])
+    const [questions, setQuestions] = useState({id:0, word:""})
 
     const handleInput = (event) =>{
         let name = event.target.name
@@ -17,7 +18,10 @@ const TakeTest = ()=>{
     }
 
     const handleTest = async (event)=>{
-        
+        console.log(langObj)
+        const hr = await axios.get(`http://localhost:8080/teach/qstns?lang1=${langObj.lang1}&catId=${langObj.category}`, langObj)
+        console.log(hr.data)
+        setQuestions(hr.data)
     }
     async function getTags(){
         const resp = await axios.get('http://localhost:8080/teach/tags')
@@ -85,9 +89,44 @@ const TakeTest = ()=>{
                     ))}
                 </TextField>                              
              </Box> 
-             <Stack  direction="row" sx={{marginLeft:'38rem'}}>               
+             <Stack  direction="row" sx={{marginLeft:'38rem'}}>
+               
                  <Button variant="contained" onClick={handleTest}>Start Test</Button>
-            </Stack>      
+            </Stack> 
+        <table>
+        
+        <tbody>
+          <tr></tr>
+        </tbody>
+        <tbody>
+          <tr>
+            
+            <th>Word</th>
+            <th>Answer</th>
+            <th>Correct Answer</th>
+            
+          </tr>
+        </tbody>
+        {questions.map((element) => {
+            return (
+              <tbody key={element.id}>
+                <tr>
+                  
+                  <td>{element.word}</td>
+                  <td>
+              <input
+                type="text"
+                className="inputBox"
+                
+              />
+            </td>
+                  <td></td>
+                  
+                </tr>
+              </tbody>
+            );
+          })}
+      </table>     
         </>
     );
 }
