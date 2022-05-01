@@ -8,7 +8,8 @@ const TakeTest = ()=>{
     const languages = ["English", "Finnish"]
     const [langObj, setLangObj] = useState({lang1:"", lang2:"", category:""})
     const [allTags, setAllTags] = useState([])
-    const [questions, setQuestions] = useState({id:0, word:""})
+    const [allQuestions, setAllQuestions] = useState([])
+    const [answer, setAnswer] = useState("")
 
     const handleInput = (event) =>{
         let name = event.target.name
@@ -21,7 +22,16 @@ const TakeTest = ()=>{
         console.log(langObj)
         const hr = await axios.get(`http://localhost:8080/teach/qstns?lang1=${langObj.lang1}&catId=${langObj.category}`, langObj)
         console.log(hr.data)
-        setQuestions(hr.data)
+        setAllQuestions(hr.data)
+    }
+
+    const submitAnswer = (value)=>{
+          console.log(value)
+                
+    }
+
+    const verify = ()=>{
+        console.log(allQuestions)
     }
     async function getTags(){
         const resp = await axios.get('http://localhost:8080/teach/tags')
@@ -89,25 +99,25 @@ const TakeTest = ()=>{
                     ))}
                 </TextField>                              
              </Box> 
-             <Stack  direction="row" sx={{marginLeft:'38rem'}}>
-               
+             <Stack  direction="row" sx={{marginLeft:'38rem'}}>               
                  <Button variant="contained" onClick={handleTest}>Start Test</Button>
             </Stack> 
         <table>
         
+        
         <tbody>
-          <tr></tr>
+            {
+                (allQuestions.length !== 0) ? 
+                <tr>
+                <th>Word</th>
+                <th>Answer</th>
+                <th>Correct Answer</th>
+                </tr> :
+                null
+            }
+                        
         </tbody>
-        <tbody>
-          <tr>
-            
-            <th>Word</th>
-            <th>Answer</th>
-            <th>Correct Answer</th>
-            
-          </tr>
-        </tbody>
-        {questions.map((element) => {
+        {allQuestions.map((element) => {
             return (
               <tbody key={element.id}>
                 <tr>
@@ -117,7 +127,9 @@ const TakeTest = ()=>{
               <input
                 type="text"
                 className="inputBox"
-                
+                name={`text${element.id}`}
+                value={element.text}
+                 onBlur={(e)=>submitAnswer(e.target.value)}
               />
             </td>
                   <td></td>
@@ -126,7 +138,13 @@ const TakeTest = ()=>{
               </tbody>
             );
           })}
-      </table>     
+      </table> 
+      {(allQuestions.length !== 0)    ? 
+          <Stack  direction="row" sx={{marginLeft:'38rem'}}>               
+                 <Button variant="contained" onClick={verify}>Verify Answer</Button>
+            </Stack>
+         : null
+        }
         </>
     );
 }
