@@ -31,6 +31,14 @@ function getTableName(type) {
   return table[type]
 }
 
+function getId(type) {
+  var id = {
+    'English': 'eng_id',
+    'Finnish': 'fin_id'
+  };
+  return id[type]
+}
+
 let connectionFunctions = {
     connect:(callback)=>{
         connection.connect((err)=>{
@@ -141,21 +149,34 @@ let connectionFunctions = {
     },
 
     findQuestions: async (qstnsObj)=>{
-            const table = getTableName(qstnsObj.lang1);
+        console.log("qstnsObj")
+        console.log(qstnsObj)
+            const table1 = getTableName(qstnsObj.lang1);
+            const table2 = getTableName(qstnsObj.lang2);
+            const id1 = getId(qstnsObj.lang1);
+            const id2 = getId(qstnsObj.lang2);
+
             const MAX_QSTN = 10;
             let sql, catId
             if(qstnsObj.catId!==""){
                 catId = Number(qstnsObj.catId)
-                sql = `SELECT id, word FROM ?? WHERE category_id = ?`
+                sql = `SELECT ${table1}.id, ${table1}.word AS word1, ${table2}.word as word2 FROM ${table1} ` +
+                        ` JOIN word_meaning ON ${table1}.id = word_meaning.${id1} `+
+                        ` JOIN ${table2} ON ${table2}.id = word_meaning.${id2} `+
+                        ` WHERE ${table1}.category_id = ? `                        
                 return new Promise((resolve, reject)=>{
-                connection.query(sql, [table, catId], (err, results)=>{
+                    console.log("sql"+sql)
+                connection.query(sql, [catId], (err, results)=>{
                     err ? reject(err) : resolve(results)
                 })
             })
             }else{
-                sql = 'SELECT id, word FROM ?? ORDER BY RAND() LIMIT ?'
+                sql = `SELECT ${table1}.id, ${table1}.word AS word1, ${table2}.word as word2 FROM ${table1} ` +
+                        ` JOIN word_meaning ON ${table1}.id = word_meaning.${id1} `+
+                        ` JOIN ${table2} ON ${table2}.id = word_meaning.${id2} `+
+                        ` ORDER BY RAND() LIMIT ? `                    
                 return new Promise((resolve, reject)=>{
-                connection.query(sql, [table, MAX_QSTN], (err, results)=>{
+                connection.query(sql, [MAX_QSTN], (err, results)=>{
                     err ? reject(err) : resolve(results)
                 })
             })
