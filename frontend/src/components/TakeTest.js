@@ -10,6 +10,7 @@ const TakeTest = ()=>{
     const [allTags, setAllTags] = useState([])
     const [allQuestions, setAllQuestions] = useState([])
     const [answer, setAnswer] = useState("")
+    const [verify, setVerify] = useState(false)
 
     const handleInput = (event) =>{
         let name = event.target.name
@@ -20,17 +21,19 @@ const TakeTest = ()=>{
 
     const handleTest = async (event)=>{
         console.log(langObj)
-        const hr = await axios.get(`http://localhost:8080/teach/qstns?lang1=${langObj.lang1}&catId=${langObj.category}`, langObj)
+        const hr = await axios.get(`http://localhost:8080/teach/qstns?lang1=${langObj.lang1}&lang2=${langObj.lang2}&catId=${langObj.category}`)
         console.log(hr.data)
         setAllQuestions(hr.data)
     }
 
-    const submitAnswer = (value)=>{
-          console.log(value)
+    const submitAnswer = (e)=>{
+        console.log(e.target.name)
+          console.log(e.target.value)
                 
     }
 
-    const verify = ()=>{
+    const verifyAnswer = ()=>{
+        setVerify(true)
         console.log(allQuestions)
     }
     async function getTags(){
@@ -121,19 +124,17 @@ const TakeTest = ()=>{
             return (
               <tbody key={element.id}>
                 <tr>
-                  
-                  <td>{element.word}</td>
+                  <td>{element.word1}</td>
                   <td>
-              <input
-                type="text"
-                className="inputBox"
-                name={`text${element.id}`}
-                value={element.text}
-                 onBlur={(e)=>submitAnswer(e.target.value)}
-              />
-            </td>
-                  <td></td>
-                  
+                    <input
+                        type="text"
+                        className="inputBox"
+                        name={`${element.id}`}
+                        value={element.text}
+                        onBlur={(e)=>submitAnswer(e)}
+                    />
+                  </td>
+                    {verify ? <td>{element.word2}</td> : null }
                 </tr>
               </tbody>
             );
@@ -141,7 +142,7 @@ const TakeTest = ()=>{
       </table> 
       {(allQuestions.length !== 0)    ? 
           <Stack  direction="row" sx={{marginLeft:'38rem'}}>               
-                 <Button variant="contained" onClick={verify}>Verify Answer</Button>
+                 <Button variant="contained" onClick={verifyAnswer}>Verify Answer</Button>
             </Stack>
          : null
         }
