@@ -33,7 +33,13 @@ const TakeTest = ()=>{
         }
         
     }
-
+    const handleReset = () => {
+        setLangObj({lang1:"", lang2:"", category:""})
+        setAllQuestions([])
+        setErr("")
+        setVerify(false)
+        setScore(0)
+    }
     const submitAnswer = (e)=>{        
         let name = e.target.name
           let value = e.target.value  
@@ -126,8 +132,9 @@ const TakeTest = ()=>{
                 </TextField> 
                 {err}                             
              </Box> 
-             <Stack  direction="row" sx={{marginLeft:'38rem'}}>               
+             <Stack  direction="row" spacing={3} sx={{marginLeft:'38rem'}}>               
                  <Button variant="contained" onClick={handleTest}>Start Test</Button>
+                 <Button variant="contained" onClick={handleReset}>Reset All</Button>
             </Stack> 
         <table>
         
@@ -164,16 +171,18 @@ const TakeTest = ()=>{
               </tbody>
             );
           })}
-          <tbody>
-            <tr>
-                <td>
-                   Your Score:
-                </td>
-                <td>
-                    {score}
-                </td>
-            </tr>
-          </tbody>        
+          {verify ? <tbody>
+                        <tr>
+                            <td>
+                            Your Score:
+                            </td>
+                            <td>
+                                {score}
+                            </td>
+                        </tr>
+                    </tbody>
+                   : null}
+                  
       </table> 
       {(allQuestions.length !== 0)    ? 
           <Stack  direction="row" sx={{marginLeft:'38rem'}}>               
