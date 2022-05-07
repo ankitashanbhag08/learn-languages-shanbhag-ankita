@@ -9,8 +9,9 @@ const TakeTest = ()=>{
     const [langObj, setLangObj] = useState({lang1:"", lang2:"", category:""})
     const [allTags, setAllTags] = useState([])
     const [allQuestions, setAllQuestions] = useState([])
-    const [answer, setAnswer] = useState("")
+    const [err, setErr] = useState("")
     const [verify, setVerify] = useState(false)
+    const[score, setScore] = useState(0)
 
     const handleInput = (event) =>{
         let name = event.target.name
@@ -20,10 +21,17 @@ const TakeTest = ()=>{
     }
 
     const handleTest = async (event)=>{
+        setVerify(false)
         console.log(langObj)
-        const hr = await axios.get(`http://localhost:8080/teach/qstns?lang1=${langObj.lang1}&lang2=${langObj.lang2}&catId=${langObj.category}`)
-        console.log(hr.data)
-        setAllQuestions(hr.data)
+        if(langObj.lang1 === langObj.lang2){
+            setErr("Select different languages")
+        } else{
+            setErr("")
+            const hr = await axios.get(`http://localhost:8080/teach/qstns?lang1=${langObj.lang1}&lang2=${langObj.lang2}&catId=${langObj.category}`)
+            console.log(hr.data)
+            setAllQuestions(hr.data)
+        }
+        
     }
 
     const submitAnswer = (e)=>{        
@@ -40,14 +48,22 @@ const TakeTest = ()=>{
     }
 
     const verifyAnswer = ()=>{
+        let i = 0
         setVerify(true)
+        for(let item of allQuestions){
+            console.log(item)
+            if(item.word2===item.wordTest)
+                i++
+        }
+        console.log(i)
+        setScore(i)
         console.log(allQuestions)
     }
     async function getTags(){
         const resp = await axios.get('http://localhost:8080/teach/tags')
         console.log(resp)
         setAllTags(resp.data)
-    }
+    } 
     useEffect(() =>{
         getTags();
     }, [])
@@ -107,7 +123,8 @@ const TakeTest = ()=>{
                         {tag.NAME}
                         </MenuItem>
                     ))}
-                </TextField>                              
+                </TextField> 
+                {err}                             
              </Box> 
              <Stack  direction="row" sx={{marginLeft:'38rem'}}>               
                  <Button variant="contained" onClick={handleTest}>Start Test</Button>
@@ -143,9 +160,20 @@ const TakeTest = ()=>{
                   </td>
                     {verify ? <td>{element.word2}</td> : null }
                 </tr>
+                                
               </tbody>
             );
           })}
+          <tbody>
+            <tr>
+                <td>
+                   Your Score:
+                </td>
+                <td>
+                    {score}
+                </td>
+            </tr>
+          </tbody>        
       </table> 
       {(allQuestions.length !== 0)    ? 
           <Stack  direction="row" sx={{marginLeft:'38rem'}}>               
