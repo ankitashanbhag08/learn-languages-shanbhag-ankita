@@ -1,6 +1,25 @@
 import React, {useState, useEffect} from "react";
 import '../styles/style.css'
 import {Box, TextField, MenuItem, Button, Stack} from '@mui/material';
+import {Table, 
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow, 
+    Paper} from '@mui/material';
+import { styled, tableCellClasses } from '@mui/material';
+
+//Styles Table Cells (header and body)
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
 
 const axios = require('axios')
 
@@ -57,11 +76,12 @@ const TakeTest = ()=>{
         let i = 0
         setVerify(true)
         for(let item of allQuestions){
-            console.log(item)
-            if(item.word2===item.wordTest)
-                i++
+            if(item.wordTest){
+                if(item.word2.toLowerCase()===item.wordTest.toLowerCase()) i++  //answers need not be same case
+            }
+            
         }
-        console.log(i)
+        
         setScore(i)
         console.log(allQuestions)
     }
@@ -75,10 +95,9 @@ const TakeTest = ()=>{
     }, [])
     return(
         <>
-            <div className="test-container">
-                <h3>Take Test</h3>
-
-            </div>
+          <div className="test-heading">
+                <h2>Take Test</h2>
+          </div> 
              <Box component="form"
                 sx={{
                     '& > :not(style)': { m: 1, width: '25ch' },
@@ -129,63 +148,72 @@ const TakeTest = ()=>{
                         {tag.NAME}
                         </MenuItem>
                     ))}
-                </TextField> 
-                {err}                             
+                </TextField>
+                <div className="create-messages">
+                    {err}
+                </div> 
+                                             
              </Box> 
              <Stack  direction="row" spacing={3} sx={{marginLeft:'38rem'}}>               
                  <Button variant="contained" onClick={handleTest}>Start Test</Button>
                  <Button variant="contained" onClick={handleReset}>Reset All</Button>
-            </Stack> 
-        <table>
-        
-        
-        <tbody>
-            {
-                (allQuestions.length !== 0) ? 
-                <tr>
-                <th>Word</th>
-                <th>Answer</th>
-                <th>Correct Answer</th>
-                </tr> :
-                null
-            }
-                        
-        </tbody>
-        {allQuestions.map((element) => {
-            return (
-              <tbody key={element.id}>
-                <tr>
-                  <td>{element.word1}</td>
-                  <td>
-                    <input
-                        type="text"
-                        className="inputBox"
-                        name={element.id}
-                        value={element.word3}
-                        onBlur={(e)=>submitAnswer(e)}
-                    />
-                  </td>
-                    {verify ? <td>{element.word2}</td> : null }
-                </tr>
+            </Stack>
+        <TableContainer sx={{ maxWidth: 850, borderRadius: 5, margin: 'auto', marginTop:'1rem' }} component={Paper}>
+            <Table sx={{ minWidth: 500 }} aria-label="spanning table">
+                {(allQuestions.length !== 0) ? 
+                        <TableHead>
+                            <TableRow>
+                                <TableCell align="center" colSpan={3}>
+                                    Translate these words and click on "Verify Answer" to generate score 
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <StyledTableCell align="center">Word</StyledTableCell>
+                                <StyledTableCell align="center">Your Answer</StyledTableCell>
+                                {verify ? <StyledTableCell align="center">Correct Answer</StyledTableCell> : null}                                
+                            </TableRow>
+                        </TableHead> 
+                : null }
+                
+                {allQuestions.map((element) => {
+                    return (
+                    <TableBody key={element.id}>
+                        <TableRow>
+                        <TableCell align="center">{element.word1}</TableCell>
+                        <TableCell align="center">
+                            <input
+                                type="text"
+                                className="inputBox"
+                                name={element.id}
+                                value={element.word3}
+                                onBlur={(e)=>submitAnswer(e)}
                                 
-              </tbody>
-            );
-          })}
-          {verify ? <tbody>
-                        <tr>
-                            <td>
-                            Your Score:
-                            </td>
-                            <td>
-                                {score}
-                            </td>
-                        </tr>
-                    </tbody>
+                            />
+                        </TableCell>
+                            {verify ? <TableCell align="center">{element.word2}</TableCell> : null }
+                        </TableRow>
+                                        
+                    </TableBody>
+                    );
+                })}
+
+                {verify ? 
+                    <TableBody>
+                        <TableRow>
+                            <TableCell rowSpan={3}></TableCell>
+                            <TableCell rowSpan={2}>Your Score:</TableCell>
+                            <TableCell>{score} / {allQuestions.length}</TableCell>
+                        </TableRow>
+                    </TableBody>
                    : null}
-                  
-      </table> 
+
+                
+            </Table>
+            
+        </TableContainer> 
+       
       {(allQuestions.length !== 0)    ? 
-          <Stack  direction="row" sx={{marginLeft:'38rem'}}>               
+          <Stack  direction="row" sx={{marginLeft:'38rem', marginBottom:'2rem', marginTop:'2rem'}}>               
                  <Button variant="contained" onClick={verifyAnswer}>Verify Answer</Button>
             </Stack>
          : null
