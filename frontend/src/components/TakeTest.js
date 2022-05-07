@@ -186,6 +186,7 @@ const TakeTest = ()=>{
                                 className="inputBox"
                                 name={element.id}
                                 value={element.word3}
+                                disabled={verify ? "disabled" : ""}
                                 onBlur={(e)=>submitAnswer(e)}
                                 
                             />
