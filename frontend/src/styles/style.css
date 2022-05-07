@@ -50,3 +50,7 @@
 .test-container{
     margin-top: 18vh;
 }
+
+.test-container h2{
+    margin-left: 10px;
+}
