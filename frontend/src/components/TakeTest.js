@@ -26,10 +26,17 @@ const TakeTest = ()=>{
         setAllQuestions(hr.data)
     }
 
-    const submitAnswer = (e)=>{
-        console.log(e.target.name)
-          console.log(e.target.value)
-                
+    const submitAnswer = (e)=>{        
+        let name = e.target.name
+          let value = e.target.value  
+           setAllQuestions(allQuestions.map((item)=>{
+               if(Number(item.id)===Number(name)){
+                   console.log(item)
+                   return({...item,
+                    wordTest:value})
+               }               
+               return item
+           }))
     }
 
     const verifyAnswer = ()=>{
@@ -129,8 +136,8 @@ const TakeTest = ()=>{
                     <input
                         type="text"
                         className="inputBox"
-                        name={`${element.id}`}
-                        value={element.text}
+                        name={element.id}
+                        value={element.word3}
                         onBlur={(e)=>submitAnswer(e)}
                     />
                   </td>
