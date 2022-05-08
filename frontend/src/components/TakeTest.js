@@ -44,14 +44,18 @@ const TakeTest = ()=>{
         console.log(langObj)
         if(langObj.lang1 === langObj.lang2){
             setErr("Select different languages")
-        } else{
-            setErr("")
-            const hr = await axios.get(`http://localhost:8080/teach/qstns?lang1=${langObj.lang1}&lang2=${langObj.lang2}&catId=${langObj.category}`)
-            console.log(hr.data)
-            setAllQuestions(hr.data)
+            return false
+        } 
+        if(!langObj.lang1 || !langObj.lang2){
+            setErr("Select both language options")
+            return false
         }
-        
+        setErr("")
+        const hr = await axios.get(`http://localhost:8080/teach/qstns?lang1=${langObj.lang1}&lang2=${langObj.lang2}&catId=${langObj.category}`)
+        console.log(hr.data)
+        setAllQuestions(hr.data)
     }
+
     const handleReset = () => {
         setLangObj({lang1:"", lang2:"", category:""})
         setAllQuestions([])
