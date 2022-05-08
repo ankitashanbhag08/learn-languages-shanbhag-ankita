@@ -78,7 +78,7 @@ const Teach = ()=>{
       category_name = tagObj ? tagObj.NAME : category_name
     //When submit is clicked - add new records in database
     if(toggleSubmit){        
-        const resp = await axios.post('/teach', wordObj)
+        const resp = await axios.post('http://localhost:8080/teach', wordObj)
         if(resp.data.engId && resp.data.engId){
             console.log(resp)
             let newRecord = {eng_word: wordObj.engWord,
@@ -100,7 +100,7 @@ const Teach = ()=>{
         
     }else{
         //When Edit Button is clicked.
-        const resp = await axios.patch(`/teach/${wordObj.engId}`, wordObj)
+        const resp = await axios.patch(`http://localhost:8080/teach/${wordObj.engId}`, wordObj)
         console.log(wordObj)
         setRecords(records.map(record=>{
             if(record.eng_id===wordObj.engId){
@@ -139,7 +139,7 @@ const Teach = ()=>{
          }
   //Called when you click on Delete icon.
   const removeItem = async (engId, finId)=>{
-      const resp = await axios.delete(`/teach?engId=${engId}&finId=${finId}`)
+      const resp = await axios.delete(`http://localhost:8080/teach?engId=${engId}&finId=${finId}`)
       console.log(resp)
       //remove the current record from set of records
       setRecords(records.filter((record)=>record.eng_id!==engId && record.fin_id!==finId))
@@ -148,10 +148,35 @@ const Teach = ()=>{
       setMsg(resp.data)
   }
 
+  const addTag = async (e) => {
+      alert("here")
+    if (e.target.value.toString().trim() === "") {
+      setMsg("Enter proper tag name and press space");
+    } else {
+      const newTag = e.target.value.toString().trim();
+      let tempTags = allTags.map((tag) => {
+        return tag.NAME.toLowerCase();
+      });
+      if (tempTags.includes(newTag.toLowerCase())) {
+        e.target.value = null;
+        setMsg("Tag already exists");
+        return;
+      }
+      console.log(newTag)
+      const resp = await axios.post('http://localhost:8080/teach/tags', {tag:newTag})
+      if(resp.data){
+          let newTagObj = {id: Number(resp.data), NAME:newTag}
+          setAllTags((allTags)=>[...allTags, newTagObj]);
+           e.target.value = "";
+           setMsg("New category added.");
+      }         
+    }
+  };
+
    async function getData(){
-      let hr = await axios.get('/teach/tags');
+      let hr = await axios.get('http://localhost:8080/teach/tags');
       setAllTags(hr.data);
-      let hrData = await axios.get('/teach');
+      let hrData = await axios.get('http://localhost:8080/teach');
       console.log(hrData.data)
       setRecords(hrData.data);
       setRecordSize(hrData.data.length)
@@ -169,12 +194,14 @@ const Teach = ()=>{
             component="form"
                 sx={{
                     '& > :not(style)': { m: 1, width: '25ch' },
-                    marginLeft:'22rem'
+                    marginLeft:'28rem'
                 }}
                 
             >
-                <TextField id="engWord" name="engWord" value={wordObj.engWord} onChange={handleInput} label="English Word" variant="outlined" required />
-                <TextField id="finWord" name="finWord" value={wordObj.finWord} onChange={handleInput} label="Finnish Word" variant="outlined" required />
+                    <TextField id="engWord" name="engWord" value={wordObj.engWord} onChange={handleInput} label="English Word" variant="outlined" required />
+                    <TextField id="finWord" name="finWord" value={wordObj.finWord} onChange={handleInput} label="Finnish Word" variant="outlined" required />
+
+                <br></br>
                 <TextField
                     id="outlined-select-currency"
                     select
@@ -190,6 +217,9 @@ const Teach = ()=>{
                         </MenuItem>
                     ))}
                 </TextField>
+                <TextField name="tags" 
+                    label="Add Categories" helperText="Click spacebar to add tags" variant="outlined"
+                    onKeyUp={(event) => event.keyCode === 32 ? addTag(event) : null} />
             </Box>
             <div className="create-messages">
                         {msg}
