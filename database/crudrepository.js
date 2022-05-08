@@ -56,6 +56,14 @@ let connectionFunctions = {
         })
         
     },
+    saveTag:(newTag)=>{
+        let sql = "INSERT INTO category_master (name) VALUES (?) "
+        return new Promise((resolve, reject)=>{
+            connection.query(sql, [newTag], (err, results)=>{
+                err ? reject(err) : resolve(results.insertId)
+            })
+        })
+    },
     //Returns records of english words, finnish translated words, categories and corresponding ids.
     findAll: () =>{
         let sql = "SELECT eng_word_master.id as eng_id,eng_word_master.word as eng_word,fin_word_master.id AS fin_id,fin_word_master.word as fin_word, category_master.name, category_master.id as cat_id FROM eng_word_master" + 
