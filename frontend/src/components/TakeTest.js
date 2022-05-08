@@ -51,7 +51,7 @@ const TakeTest = ()=>{
             return false
         }
         setErr("")
-        const hr = await axios.get(`http://localhost:8080/teach/qstns?lang1=${langObj.lang1}&lang2=${langObj.lang2}&catId=${langObj.category}`)
+        const hr = await axios.get(`/teach/qstns?lang1=${langObj.lang1}&lang2=${langObj.lang2}&catId=${langObj.category}`)
         console.log(hr.data)
         setAllQuestions(hr.data)
     }
@@ -90,7 +90,7 @@ const TakeTest = ()=>{
         console.log(allQuestions)
     }
     async function getTags(){
-        const resp = await axios.get('http://localhost:8080/teach/tags')
+        const resp = await axios.get('/teach/tags')
         console.log(resp)
         setAllTags(resp.data)
     } 
