@@ -78,7 +78,7 @@ const Teach = ()=>{
       category_name = tagObj ? tagObj.NAME : category_name
     //When submit is clicked - add new records in database
     if(toggleSubmit){        
-        const resp = await axios.post('http://localhost:8080/teach', wordObj)
+        const resp = await axios.post('/teach', wordObj)
         if(resp.data.engId && resp.data.engId){
             console.log(resp)
             let newRecord = {eng_word: wordObj.engWord,
@@ -100,7 +100,7 @@ const Teach = ()=>{
         
     }else{
         //When Edit Button is clicked.
-        const resp = await axios.patch(`http://localhost:8080/teach/${wordObj.engId}`, wordObj)
+        const resp = await axios.patch(`/teach/${wordObj.engId}`, wordObj)
         console.log(wordObj)
         setRecords(records.map(record=>{
             if(record.eng_id===wordObj.engId){
@@ -139,7 +139,7 @@ const Teach = ()=>{
          }
   //Called when you click on Delete icon.
   const removeItem = async (engId, finId)=>{
-      const resp = await axios.delete(`http://localhost:8080/teach?engId=${engId}&finId=${finId}`)
+      const resp = await axios.delete(`/teach?engId=${engId}&finId=${finId}`)
       console.log(resp)
       //remove the current record from set of records
       setRecords(records.filter((record)=>record.eng_id!==engId && record.fin_id!==finId))
@@ -163,7 +163,7 @@ const Teach = ()=>{
         return;
       }
       console.log(newTag)
-      const resp = await axios.post('http://localhost:8080/teach/tags', {tag:newTag})
+      const resp = await axios.post('/teach/tags', {tag:newTag})
       if(resp.data){
           let newTagObj = {id: Number(resp.data), NAME:newTag}
           setAllTags((allTags)=>[...allTags, newTagObj]);
@@ -174,9 +174,9 @@ const Teach = ()=>{
   };
 
    async function getData(){
-      let hr = await axios.get('http://localhost:8080/teach/tags');
+      let hr = await axios.get('/teach/tags');
       setAllTags(hr.data);
-      let hrData = await axios.get('http://localhost:8080/teach');
+      let hrData = await axios.get('/teach');
       console.log(hrData.data)
       setRecords(hrData.data);
       setRecordSize(hrData.data.length)
