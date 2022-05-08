@@ -10,6 +10,7 @@ router.get("/tags", async (req, resp)=>{
         console.log(results)
         resp.send(results);
     }catch(err){
+        console.log(err)
         //500:Internal Server Error
         resp.status(500).end();
     }    
@@ -34,10 +35,27 @@ router.get("/", async (req, resp)=>{
         const results = await database.findAll();
         resp.send(results);
     }catch(err){
+        console.log(err)
         //500:Internal Server Error
         resp.status(500).end();
     }    
 });
+
+router.post('/tags', async (req, resp)=>{
+    try{
+      console.log("Adding Tags")
+        let newTag = req.body;
+        console.log(newTag)        
+          const newId=await database.saveTag(newTag.tag)
+          //201: New source created/ new row added to database.
+          resp.status(201).send(`${newId}`)             
+        
+    }catch(err){
+        //500:Internal Server Error
+        console.log(err)
+        resp.status(500).end();
+    }
+})
 
 router.post('/', async (req, resp)=>{
     try{
@@ -49,6 +67,7 @@ router.post('/', async (req, resp)=>{
             resp.status(201).send(respObj)              
         
     }catch(err){
+        console.log(err)
         //500:Internal Server Error
         resp.status(500).end();
     }
@@ -83,9 +102,10 @@ router.delete('/', async (req, resp)=>{
             resp.status(200).send("Record Deleted");
         }else{
             //404 Not Found:The server can not find the requested resource.
-            resp.status(404).send("Record nor deleted"); 
+            resp.status(404).send("Record not deleted"); 
         } 
     }catch(err){
+        console.log(err)
         //500:Internal Server Error
         resp.status(500).end();
     }
