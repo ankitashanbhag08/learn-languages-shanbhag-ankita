@@ -157,7 +157,7 @@ let connectionFunctions = {
                 await execQuery(sql1, [engId])      
                 console.log(sql1)
                 await execQuery(sql2, [finId])              
-               // await execQuery(sql3, [germanId])                
+                await execQuery(sql3, [germanId])                
                 await connection.commit();
                 recordDeleted=true
                 return(recordDeleted)
