@@ -26,7 +26,8 @@ const execQuery = (query, params) => {
 function getTableName(type) {
   var table = {
     'English': 'eng_word_master',
-    'Finnish': 'fin_word_master'
+    'Finnish': 'fin_word_master',
+    'German' : 'german_word_master',
   };
   return table[type]
 }
@@ -34,7 +35,8 @@ function getTableName(type) {
 function getId(type) {
   var id = {
     'English': 'eng_id',
-    'Finnish': 'fin_id'
+    'Finnish': 'fin_id',
+    'German' : 'german_id'
   };
   return id[type]
 }
@@ -66,9 +68,10 @@ let connectionFunctions = {
     },
     //Returns records of english words, finnish translated words, categories and corresponding ids.
     findAll: () =>{
-        let sql = "SELECT eng_word_master.id as eng_id,eng_word_master.word as eng_word,fin_word_master.id AS fin_id,fin_word_master.word as fin_word, category_master.name, category_master.id as cat_id FROM eng_word_master" + 
+        let sql = "SELECT eng_word_master.id as eng_id,eng_word_master.word as eng_word,fin_word_master.id AS fin_id,fin_word_master.word as fin_word, german_word_master.word as german_word, category_master.name, category_master.id as cat_id FROM eng_word_master" + 
                     " JOIN word_meaning ON eng_word_master.id = word_meaning.eng_id"+
                     " JOIN fin_word_master ON fin_word_master.id = word_meaning.fin_id"+
+                    " JOIN german_word_master ON german_word_master.id = word_meaning.german_id"+
                     " LEFT OUTER JOIN category_master ON eng_word_master.category_id = category_master.id;"  
         console.log(sql)      
         return new Promise((resolve, reject)=>{
@@ -87,15 +90,17 @@ let connectionFunctions = {
             category = (newWord.category==="") ? category : newWord.category;
             const sql1 = "INSERT INTO eng_word_master (word, category_id) VALUES (?, ?)"
             const sql2 = "INSERT INTO fin_word_master (word, category_id) VALUES (?, ?)"
-            const sql3 = "INSERT INTO word_meaning (eng_id, fin_id) VALUES (?, ?);"
+            const sql3 = "INSERT INTO german_word_master (word, category_id) VALUES (?, ?)"
+            const sql4 = "INSERT INTO word_meaning (eng_id, fin_id, german_id) VALUES (?, ?, ?);"
             try{
                 await connection.beginTransaction();
                 let result1 = await execQuery(sql1, [newWord.engWord, category])     
                 let result2 = await execQuery(sql2, [newWord.finWord, category])
+                let result3 = await execQuery(sql3, [newWord.germanWord, category])
                 //inserts foreign keys(eng_id and fin_id) from above 2 queries
-                let result3 = await execQuery(sql3, [result1.insertId, result2.insertId])                
+                let result4 = await execQuery(sql4, [result1.insertId, result2.insertId, result3.insertId])                
                 await connection.commit();
-                return({engId:result1.insertId, finId:result2.insertId})
+                return({engId:result1.insertId, finId:result2.insertId, germanId:result3.insertId})
             }catch(err){
                 await connection.rollback();
                 console.log(err)
