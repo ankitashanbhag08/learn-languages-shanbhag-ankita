@@ -68,10 +68,13 @@ let connectionFunctions = {
     },
     //Returns records of english words, finnish translated words, categories and corresponding ids.
     findAll: () =>{
-        let sql = "SELECT eng_word_master.id as eng_id,eng_word_master.word as eng_word,fin_word_master.id AS fin_id,fin_word_master.word as fin_word, german_word_master.word as german_word, category_master.name, category_master.id as cat_id FROM eng_word_master" + 
+        let sql = "SELECT eng_word_master.id as eng_id,eng_word_master.word as eng_word," +
+                    " fin_word_master.id AS fin_id,fin_word_master.word as fin_word, " +
+                    " german_word_master.word as german_word, german_word_master.id as german_id, " +
+                    " category_master.name, category_master.id as cat_id FROM eng_word_master" + 
                     " JOIN word_meaning ON eng_word_master.id = word_meaning.eng_id"+
-                    " JOIN fin_word_master ON fin_word_master.id = word_meaning.fin_id"+
-                    " JOIN german_word_master ON german_word_master.id = word_meaning.german_id"+
+                    "  JOIN fin_word_master ON fin_word_master.id = word_meaning.fin_id"+
+                    "  JOIN german_word_master ON german_word_master.id = word_meaning.german_id"+
                     " LEFT OUTER JOIN category_master ON eng_word_master.category_id = category_master.id;"  
         console.log(sql)      
         return new Promise((resolve, reject)=>{
@@ -114,18 +117,21 @@ let connectionFunctions = {
          let category=null;
          //If category is not given the insert category id id set tu NULL.
             category = (word.category==="") ? category : Number(word.category);
-         let finId = Number(word.engId)
+         let finId = Number(word.finId)
          let engId=Number(word.engId)
+         let germanId=Number(word.germanId)
           
         let recordsUpdated = false
         let sql1 = `UPDATE eng_word_master SET word = ?, category_id = ? WHERE id = ?`
         let sql2 = `UPDATE fin_word_master SET word = ?, category_id = ? WHERE id = ?`
+        let sql3 = `UPDATE german_word_master SET word = ?, category_id = ? WHERE id = ?`
         try{
                 await connection.beginTransaction();
                 console.log(word)
                 await execQuery(sql1, [word.engWord, category, engId])     
                 
                 await execQuery(sql2, [word.finWord, category, finId])
+                await execQuery(sql3, [word.germanWord, category, germanId])
                 await connection.commit();
                 //Set this flag to true, if transaction is committed.
                 recordsUpdated=true;
