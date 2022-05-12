@@ -52,7 +52,7 @@ const Learn = () => {
   };
   
    async function getData(){
-      let hr = await axios.get('/teach');
+      let hr = await axios.get('http://localhost:8080/teach');
       console.log(hr.data)
       setRecords(hr.data);
       setRecordSize(hr.data.length)
@@ -80,6 +80,7 @@ const Learn = () => {
             <TableRow>
                 <StyledTableCell align="center">English Word</StyledTableCell>
                 <StyledTableCell align="center">Finnish Word</StyledTableCell>
+                <StyledTableCell align="center">German Word</StyledTableCell>
                 <StyledTableCell align="center">Category</StyledTableCell>
             </TableRow>
           </TableHead>
@@ -88,11 +89,14 @@ const Learn = () => {
                         /*FIX: To prevent NULL Pointer Exception.
                         record.name means category. If category is NULL, then returns an empty string.
                         Filters records based upon the string typed in Search bar.*/
-                        record.name = (record.name!==null) ?  record.name  : ""                   
+                        record.name = (record.name!==null) ?  record.name  : ""
+                        record.fin_word  = (record.fin_word!==null) ?  record.fin_word  : ""
+                        record.german_word  = (record.german_word!==null) ?  record.german_word  : ""                
                             if(query===""){
                             return record
                             }else if(record.eng_word.toLowerCase().includes(query.toLowerCase()) ||
                                      record.fin_word.toLowerCase().includes(query.toLowerCase()) ||
+                                     record.german_word.toLowerCase().includes(query.toLowerCase()) ||
                                      record.name.toLowerCase().includes(query.toLowerCase())){
                                 return record
                             }else return null
@@ -105,6 +109,7 @@ const Learn = () => {
                   <StyledTableRow key={record.eng_id}>
                         <StyledTableCell align="center">{record.eng_word}</StyledTableCell>
                         <StyledTableCell align="center">{record.fin_word}</StyledTableCell>
+                        <StyledTableCell align="center">{record.german_word}</StyledTableCell>
                         <StyledTableCell align="center">{record.name}</StyledTableCell>
                   </StyledTableRow>
                 );
