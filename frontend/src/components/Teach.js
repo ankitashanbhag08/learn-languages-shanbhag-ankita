@@ -20,9 +20,11 @@ const Teach = ()=>{
   const [wordObj, setWordObj] = useState({
     engWord: "",
     finWord: "",
+    germanWord: "",
     category: "",
     engId:"",
     finId:"",
+    germanId:"",
     catId:""
   });
   //Determines Edit or Submit 
@@ -59,16 +61,18 @@ const Teach = ()=>{
     event.preventDefault();
     setWordObj({engWord: "",
     finWord: "",
+    germanWord: "",
     category: "",
     engId:"",
     finId:"",
+    germanId: "",
     catId:""})
   }
 
   //Called when Edit/Submit is clicked
   const handleSubmit = async (event)=>{
       event.preventDefault();
-      if(wordObj.engWord==="" || wordObj.finWord==="") {
+      if(wordObj.engWord==="" || wordObj.finWord==="" || wordObj.germanWord==="") {
           setMsg("Fill the mandatory fields")
           return false
       }
@@ -78,14 +82,16 @@ const Teach = ()=>{
       category_name = tagObj ? tagObj.NAME : category_name
     //When submit is clicked - add new records in database
     if(toggleSubmit){        
-        const resp = await axios.post('/teach', wordObj)
+        const resp = await axios.post('http://localhost:8080/teach', wordObj)
         if(resp.data.engId && resp.data.engId){
             console.log(resp)
             let newRecord = {eng_word: wordObj.engWord,
             fin_word: wordObj.finWord,
+            german_word: wordObj.germanWord,
             cat_id: Number(wordObj.category),
             eng_id:resp.data.engId,
             fin_id:resp.data.finId,
+            german_id:resp.data.germanId,
             name:category_name}
             console.log(newRecord)
             //updates current records and adds new record.
@@ -100,16 +106,18 @@ const Teach = ()=>{
         
     }else{
         //When Edit Button is clicked.
-        const resp = await axios.patch(`/teach/${wordObj.engId}`, wordObj)
+        const resp = await axios.patch(`http://localhost:8080/teach/${wordObj.engId}`, wordObj)
         console.log(wordObj)
         setRecords(records.map(record=>{
             if(record.eng_id===wordObj.engId){
                 return({...record,
                     eng_word:wordObj.engWord,
                     fin_word: wordObj.finWord,
+                    german_word: wordObj.germanWord,
                     cat_id: Number(wordObj.category),
                     eng_id:Number(wordObj.engId), 
                     fin_id:Number(wordObj.finId) ,
+                    german_id:Number(wordObj.germanId),
                     name:category_name})
                 };
                 return record
@@ -119,10 +127,12 @@ const Teach = ()=>{
     }
     setWordObj({ 
             engWord: "", 
-            finWord:"", 
+            finWord:"",
+            germanWord:"", 
             category:"", 
             engId:"",
-            finId:""})
+            finId:"",
+            germanId:""})
   }
   //record.name:"Colors", record.name:integer
   //Called when you click on edit icon.
@@ -132,17 +142,19 @@ const Teach = ()=>{
         setToggleSubmit(false);
         setWordObj({...wordObj, 
             engWord: record.eng_word, 
-            finWord:record.fin_word, 
+            finWord:record.fin_word,
+            germanWord:record.german_word, 
             category:record.cat_id, 
             engId:record.eng_id,
-            finId:record.fin_id})
+            finId:record.fin_id,
+            germanId:record.german_id})
          }
   //Called when you click on Delete icon.
-  const removeItem = async (engId, finId)=>{
-      const resp = await axios.delete(`/teach?engId=${engId}&finId=${finId}`)
+  const removeItem = async (engId, finId, germanId)=>{
+      const resp = await axios.delete(`http://localhost:8080/teach?engId=${engId}&finId=${finId}&germanId=${germanId}`)
       console.log(resp)
       //remove the current record from set of records
-      setRecords(records.filter((record)=>record.eng_id!==engId && record.fin_id!==finId))
+      setRecords(records.filter((record)=>record.eng_id!==engId && record.fin_id!==finId && record.german_id!==germanId))
       //Decrease the record size
       setRecordSize(recordSize-1)
       setMsg(resp.data)
@@ -163,7 +175,7 @@ const Teach = ()=>{
         return;
       }
       console.log(newTag)
-      const resp = await axios.post('/teach/tags', {tag:newTag})
+      const resp = await axios.post('http://localhost:8080/teach/tags', {tag:newTag})
       if(resp.data){
           let newTagObj = {id: Number(resp.data), NAME:newTag}
           setAllTags((allTags)=>[...allTags, newTagObj]);
@@ -174,9 +186,9 @@ const Teach = ()=>{
   };
 
    async function getData(){
-      let hr = await axios.get('/teach/tags');
+      let hr = await axios.get('http://localhost:8080/teach/tags');
       setAllTags(hr.data);
-      let hrData = await axios.get('/teach');
+      let hrData = await axios.get('http://localhost:8080/teach');
       console.log(hrData.data)
       setRecords(hrData.data);
       setRecordSize(hrData.data.length)
@@ -200,7 +212,7 @@ const Teach = ()=>{
             >
                     <TextField id="engWord" name="engWord" value={wordObj.engWord} onChange={handleInput} label="English Word" variant="outlined" required />
                     <TextField id="finWord" name="finWord" value={wordObj.finWord} onChange={handleInput} label="Finnish Word" variant="outlined" required />
-
+                    <TextField id="germanWord" name="germanWord" value={wordObj.germanWord} onChange={handleInput} label="German Word" variant="outlined" required />
                 <br></br>
                 <TextField
                     id="outlined-select-currency"
@@ -247,6 +259,7 @@ const Teach = ()=>{
                     <TableRow>
                         <TableCell className="table-header" align="center">English Word</TableCell>
                         <TableCell className="table-header" align="center">Finnish Word</TableCell>
+                        <TableCell className="table-header" align="center">German Word</TableCell>
                         <TableCell className="table-header" align="center">Category</TableCell>
                         <TableCell className="table-header" align="center">Action</TableCell>
                     </TableRow>
@@ -261,6 +274,7 @@ const Teach = ()=>{
                             return record
                             }else if(record.eng_word.toLowerCase().includes(query.toLowerCase()) ||
                                      record.fin_word.toLowerCase().includes(query.toLowerCase()) ||
+                                     record.german_word.toLowerCase().includes(query.toLowerCase()) ||
                                      record.name.toLowerCase().includes(query.toLowerCase())){
                                 return record
                             }else return null
@@ -275,12 +289,13 @@ const Teach = ()=>{
                         >
                         <TableCell align="center">{record.eng_word}</TableCell>
                         <TableCell align="center">{record.fin_word}</TableCell>
+                        <TableCell align="center">{record.german_word}</TableCell>
                         <TableCell align="center">{record.name}</TableCell>
                         <TableCell align="center">
                                 <DeleteTwoToneIcon
                                     className="icons delete"
                                     title="Delete Item"
-                                    onClick={() => removeItem(record.eng_id,record.fin_id)}
+                                    onClick={() => removeItem(record.eng_id,record.fin_id, record.german_id)}
                                 />
 
                                 <EditTwoToneIcon
