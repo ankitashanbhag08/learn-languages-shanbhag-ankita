@@ -160,8 +160,7 @@ const Teach = ()=>{
       setMsg(resp.data)
   }
 
-  const addTag = async (e) => {
-      alert("here")
+  const addTag = async (e) => {      
     if (e.target.value.toString().trim() === "") {
       setMsg("Enter proper tag name and press space");
     } else {
@@ -206,7 +205,7 @@ const Teach = ()=>{
             component="form"
                 sx={{
                     '& > :not(style)': { m: 1, width: '25ch' },
-                    marginLeft:'28rem'
+                    marginLeft:'20rem'
                 }}
                 
             >
@@ -223,6 +222,7 @@ const Teach = ()=>{
                     onChange={handleInput}
                     helperText="Please select a category"
                     >
+                        <MenuItem value="">None</MenuItem>
                     {allTags.map((tag) => (
                         <MenuItem key={tag.id} value={tag.id}> 
                         {tag.NAME}
