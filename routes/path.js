@@ -95,8 +95,9 @@ router.delete('/', async (req, resp)=>{
         //idTodelete: object that contains id to be deleted.
         const idTodelete=req.query;
         let finId = Number(idTodelete.finId);
-        let engId=Number(idTodelete.engId)
-        const rowDeleted = await database.delete(engId, finId);        
+        let engId=Number(idTodelete.engId);
+        let germanId=Number(idTodelete.germanId)
+        const rowDeleted = await database.delete(engId, finId, germanId);        
         if(rowDeleted){
             //200 OK:The server has fulfilled the request.
             resp.status(200).send("Record Deleted");
