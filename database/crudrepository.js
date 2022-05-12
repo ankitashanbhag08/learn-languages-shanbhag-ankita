@@ -73,8 +73,8 @@ let connectionFunctions = {
                     " german_word_master.word as german_word, german_word_master.id as german_id, " +
                     " category_master.name, category_master.id as cat_id FROM eng_word_master" + 
                     " JOIN word_meaning ON eng_word_master.id = word_meaning.eng_id"+
-                    "  JOIN fin_word_master ON fin_word_master.id = word_meaning.fin_id"+
-                    "  JOIN german_word_master ON german_word_master.id = word_meaning.german_id"+
+                    " JOIN fin_word_master ON fin_word_master.id = word_meaning.fin_id"+
+                    " JOIN german_word_master ON german_word_master.id = word_meaning.german_id"+
                     " LEFT OUTER JOIN category_master ON eng_word_master.category_id = category_master.id;"  
         console.log(sql)      
         return new Promise((resolve, reject)=>{
@@ -144,19 +144,20 @@ let connectionFunctions = {
         
     },
     //Delete word and it's meaning.
-    delete:async (engId, finId)=>{
+    delete:async (engId, finId, germanId)=>{
         console.log("English id"  + engId)
             let recordDeleted=false
             const sql1 = "DELETE FROM eng_word_master where id = ?"
             const sql2 = "DELETE FROM fin_word_master where id = ?"
-            const sql3 = "DELETE FROM word_meaning where eng_id = ? AND fin_id = ?"
+            const sql3 = "DELETE FROM german_word_master where id = ?"
+            const sql4 = "DELETE FROM word_meaning where eng_id = ? AND fin_id = ?"
             try{
                 await connection.beginTransaction();
-                await execQuery(sql3, [engId, finId])
+                await execQuery(sql4, [engId, finId])
                 await execQuery(sql1, [engId])      
                 console.log(sql1)
                 await execQuery(sql2, [finId])              
-                                
+               // await execQuery(sql3, [germanId])                
                 await connection.commit();
                 recordDeleted=true
                 return(recordDeleted)
