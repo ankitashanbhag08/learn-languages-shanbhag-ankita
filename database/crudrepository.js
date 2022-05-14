@@ -119,8 +119,8 @@ let connectionFunctions = {
                     " german_word_master.word as german_word, german_word_master.id as german_id, " +
                     " category_master.name, category_master.id as cat_id FROM eng_word_master" + 
                     " JOIN word_meaning ON eng_word_master.id = word_meaning.eng_id"+
-                    "  fin_word_master ON fin_word_master.id = word_meaning.fin_id"+
-                    "  german_word_master ON german_word_master.id = word_meaning.german_id"+
+                    "  JOIN fin_word_master ON fin_word_master.id = word_meaning.fin_id"+
+                    "  JOIN german_word_master ON german_word_master.id = word_meaning.german_id"+
                     " LEFT OUTER JOIN category_master ON eng_word_master.category_id = category_master.id;"  
         console.log(sql)      
         return new Promise((resolve, reject)=>{
