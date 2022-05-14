@@ -8,9 +8,16 @@ import SchoolIcon from '@mui/icons-material/School';
 
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 
+/**
+ * Component for Navbar.
+ * @component
+ */
 
 const Navbar = ()=>{ 
-    //Defines the current active tab
+    
+    /**
+     * Defines the current active tab
+     */
     const [value, setValue]  = useState("/");
     return(
         <>

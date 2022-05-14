@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/src/components/Learn.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/src/components/Learn.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import  React, {useState, useEffect} from 'react';
+import { styled, tableCellClasses } from '@mui/material';
+import {Paper,
+        Table,
+        TableBody,
+        TableCell,
+        TableContainer,
+        TableHead,
+        TablePagination,
+        TableRow} from '@mui/material';
+
+const axios = require('axios')
+
+/**
+ * Styles Table Cells (header and body)
+ */
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&amp;.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  [`&amp;.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+//Styles Table Cells - gives alternate color to rows.
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&amp;:nth-of-type(odd)': {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  '&amp;:last-child td, &amp;:last-child th': {
+    border: 0,
+  },
+}));
+
+/**
+ * Component for displaying word, translated words and it's category.
+ * @component
+ * @returns &lt;TableContainer> table of words and translated word with category.
+ */
+
+const Learn = () => {
+  /**
+   * hook for records from the database.
+   * @typedef {Array&lt;objects>}
+   */
+  const [records, setRecords] = useState([])
+  /**
+   * state for search bar
+   * @typedef {string}
+   */
+  const [query, setQuery] = useState("");  
+  /**
+   * hook for pagination
+   * @typedef {number}
+   */
+  const [page, setPage] = useState(0);
+  /**
+   * hook for pagination
+   * @typedef {number}
+   */
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  /**
+   * hook for pagination
+   * @typedef {number}
+   */
+  const [recordSize, setRecordSize] = useState(0);
+  /**
+   * Sets page number
+   * @param {event} event 
+   * @param {integer} newPage 
+   */
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+  /**
+   * Sets row per page and updates page number
+   * @param {event} event 
+   */
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+  /**
+   * Gets records from backend
+   */
+   async function getData(){
+      let hr = await axios.get('http://localhost:8080/teach');
+      console.log(hr.data)
+      setRecords(hr.data);
+      setRecordSize(hr.data.length)
+    }   
+   /**
+    * Called when the page is loaded
+    */
+   useEffect(()=>{  
+      getData();
+      
+  },[])  
+  return (
+   /**
+    * Generates Material UI table
+    */
+    &lt;Paper sx={{ width: '80%', margin: 'auto', marginTop: '18vh' }}>
+      &lt;h3 className='learn-header'>Learn words and take the test&lt;/h3>
+      &lt;div>
+        &lt;input
+            className="search-box-learn"
+            type="text"
+            placeholder="Search Here"
+            onChange={(event) => setQuery(event.target.value)}
+        />
+      &lt;/div>
+      &lt;TableContainer sx={{ maxHeight: 440 }}>
+        &lt;Table stickyHeader aria-label="sticky table">
+          &lt;TableHead>            
+            &lt;TableRow>
+                &lt;StyledTableCell align="center">English Word&lt;/StyledTableCell>
+                &lt;StyledTableCell align="center">Finnish Word&lt;/StyledTableCell>
+                &lt;StyledTableCell align="center">German Word&lt;/StyledTableCell>
+                &lt;StyledTableCell align="center">Category&lt;/StyledTableCell>
+            &lt;/TableRow>
+          &lt;/TableHead>
+          &lt;TableBody>
+             {records.filter(record=>{  
+                        /*FIX: To prevent NULL Pointer Exception.
+                        record.name means category. If category is NULL, then returns an empty string.
+                        Filters records based upon the string typed in Search bar.*/
+                        record.name = (record.name!==null) ?  record.name  : ""
+                        record.fin_word  = (record.fin_word!==null) ?  record.fin_word  : ""
+                        record.german_word  = (record.german_word!==null) ?  record.german_word  : ""                
+                            if(query===""){
+                            return record
+                            }else if(record.eng_word.toLowerCase().includes(query.toLowerCase()) ||
+                                     record.fin_word.toLowerCase().includes(query.toLowerCase()) ||
+                                     record.german_word.toLowerCase().includes(query.toLowerCase()) ||
+                                     record.name.toLowerCase().includes(query.toLowerCase())){
+                                return record
+                            }else return null
+                })
+                //Determines rows per page.
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              //Iterates through the records and displays word, its translation and category(if any) within the table.
+              .map((record) => {
+                return (
+                  &lt;StyledTableRow key={record.eng_id}>
+                        &lt;StyledTableCell align="center">{record.eng_word}&lt;/StyledTableCell>
+                        &lt;StyledTableCell align="center">{record.fin_word}&lt;/StyledTableCell>
+                        &lt;StyledTableCell align="center">{record.german_word}&lt;/StyledTableCell>
+                        &lt;StyledTableCell align="center">{record.name}&lt;/StyledTableCell>
+                  &lt;/StyledTableRow>
+                );
+              })}
+          &lt;/TableBody>
+        &lt;/Table>
+      &lt;/TableContainer>
+      &lt;TablePagination
+        rowsPerPageOptions={[5,10,15, { value: -1, label: 'All' }]}
+        component="div"
+        count={recordSize}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+    &lt;/Paper>
+  
+  );
+}
+export default Learn;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-connectionFunctions.html">connectionFunctions</a></li><li><a href="module-router.html">router</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connection">connection</a></li><li><a href="global.html#execQuery">execQuery</a></li><li><a href="global.html#getId">getId</a></li><li><a href="global.html#getTableName">getTableName</a></li><li><a href="global.html#Learn">Learn</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#router">router</a></li><li><a href="global.html#StyledTableCell">StyledTableCell</a></li><li><a href="global.html#Teach">Teach</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Sat May 14 2022 10:21:39 GMT+0300 (Eastern European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

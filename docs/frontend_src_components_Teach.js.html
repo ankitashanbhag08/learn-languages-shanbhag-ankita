@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/src/components/Teach.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/src/components/Teach.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, {useState, useEffect} from "react";
+import '../styles/style.css'
+import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import {Table, 
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow, 
+    Paper,
+    TablePagination,
+    TableFooter} from '@mui/material';
+import {Box, TextField, MenuItem, Button, Stack} from '@mui/material';
+import { jsx } from "@emotion/react";
+
+const axios = require('axios')
+/**
+ * Component for adding word, translated words and it's category.
+ * @component
+ * @returns {jsx}
+ */
+const Teach = ()=>{
+  /**
+   * Stores value from the text fields.
+   * typedef {Array&lt;objects>}
+   */
+  const [wordObj, setWordObj] = useState({
+    engWord: "",
+    finWord: "",
+    germanWord: "",
+    category: "",
+    engId:"",
+    finId:"",
+    germanId:"",
+    catId:""
+  });
+  //Determines Edit or Submit 
+  const [toggleSubmit, setToggleSubmit] = useState(true);
+  //hook for search bar
+  const [query, setQuery] = useState("");
+  //hook for records from the database.
+  const [records, setRecords] = useState([])
+  //hook for all categories.
+  const [allTags, setAllTags] = useState([])
+  const [msg, setMsg] = useState("")
+  //hooks for pagination.
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [recordSize, setRecordSize] = useState(0);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {      
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+//Called when value is changed in any of the text fields 
+  const handleInput = (event)=>{
+    const name = event.target.name;
+    const value = event.target.value;
+    console.log(`${name} : ${value}`)
+    setWordObj({...wordObj, [name]:value})
+  }
+//Called when Reset button is clicked
+  const handleReset = (event)=>{
+    event.preventDefault();
+    setWordObj({engWord: "",
+    finWord: "",
+    germanWord: "",
+    category: "",
+    engId:"",
+    finId:"",
+    germanId: "",
+    catId:""})
+  }
+
+  /**
+   * Called when Edit/Submit is clicked
+   * @param {event} event 
+   * @returns void
+   */
+  const handleSubmit = async (event)=>{
+      event.preventDefault();
+      if(wordObj.engWord==="" || wordObj.finWord==="" || wordObj.germanWord==="") {
+          setMsg("Fill the mandatory fields")
+          return false
+      }
+      //FIX: To display Category name, instead of category id (in the table)
+      let category_name=""
+      let tagObj = allTags.find((tag)=>tag.id===Number(wordObj.category))
+      category_name = tagObj ? tagObj.NAME : category_name
+    //When submit is clicked - add new records in database
+    if(toggleSubmit){        
+        const resp = await axios.post('http://localhost:8080/teach', wordObj)
+        if(resp.data.engId &amp;&amp; resp.data.engId){
+            console.log(resp)
+            let newRecord = {eng_word: wordObj.engWord,
+            fin_word: wordObj.finWord,
+            german_word: wordObj.germanWord,
+            cat_id: Number(wordObj.category),
+            eng_id:resp.data.engId,
+            fin_id:resp.data.finId,
+            german_id:resp.data.germanId,
+            name:category_name}
+            console.log(newRecord)
+            //updates current records and adds new record.
+            setRecords((record)=>[...record, newRecord])
+            //increase the record size
+            setRecordSize(recordSize+1)
+            setMsg("Records Saved!")
+        }
+        else {
+            setMsg("Error in Saving!")}
+         
+        
+    }else{
+        //When Edit Button is clicked.
+        const resp = await axios.patch(`http://localhost:8080/teach/${wordObj.engId}`, wordObj)
+        console.log(wordObj)
+        setRecords(records.map(record=>{
+            if(record.eng_id===wordObj.engId){
+                return({...record,
+                    eng_word:wordObj.engWord,
+                    fin_word: wordObj.finWord,
+                    german_word: wordObj.germanWord,
+                    cat_id: Number(wordObj.category),
+                    eng_id:Number(wordObj.engId), 
+                    fin_id:Number(wordObj.finId) ,
+                    german_id:Number(wordObj.germanId),
+                    name:category_name})
+                };
+                return record
+            }))
+        setToggleSubmit(true)
+        setMsg(resp.data) 
+    }
+    setWordObj({ 
+            engWord: "", 
+            finWord:"",
+            germanWord:"", 
+            category:"", 
+            engId:"",
+            finId:"",
+            germanId:""})
+  }
+  //record.name:"Colors", record.name:integer
+  //Called when you click on edit icon.
+  const editItem = (record)=>{
+        console.log(record)
+        console.log(record.cat_id)
+        setToggleSubmit(false);
+        setWordObj({...wordObj, 
+            engWord: record.eng_word, 
+            finWord:record.fin_word,
+            germanWord:record.german_word, 
+            category:record.cat_id, 
+            engId:record.eng_id,
+            finId:record.fin_id,
+            germanId:record.german_id})
+         }
+  //Called when you click on Delete icon.
+  const removeItem = async (engId, finId, germanId)=>{
+      const resp = await axios.delete(`http://localhost:8080/teach?engId=${engId}&amp;finId=${finId}&amp;germanId=${germanId}`)
+      console.log(resp)
+      //remove the current record from set of records
+      setRecords(records.filter((record)=>record.eng_id!==engId &amp;&amp; record.fin_id!==finId &amp;&amp; record.german_id!==germanId))
+      //Decrease the record size
+      setRecordSize(recordSize-1)
+      setMsg(resp.data)
+  }
+
+  const addTag = async (e) => {      
+    if (e.target.value.toString().trim() === "") {
+      setMsg("Enter proper tag name and press space");
+    } else {
+      const newTag = e.target.value.toString().trim();
+      let tempTags = allTags.map((tag) => {
+        return tag.NAME.toLowerCase();
+      });
+      if (tempTags.includes(newTag.toLowerCase())) {
+        e.target.value = null;
+        setMsg("Tag already exists");
+        return;
+      }
+      console.log(newTag)
+      const resp = await axios.post('http://localhost:8080/teach/tags', {tag:newTag})
+      if(resp.data){
+          let newTagObj = {id: Number(resp.data), NAME:newTag}
+          setAllTags((allTags)=>[...allTags, newTagObj]);
+           e.target.value = "";
+           setMsg("New category added.");
+      }         
+    }
+  };
+
+   async function getData(){
+      let hr = await axios.get('http://localhost:8080/teach/tags');
+      setAllTags(hr.data);
+      let hrData = await axios.get('http://localhost:8080/teach');
+      console.log(hrData.data)
+      setRecords(hrData.data);
+      setRecordSize(hrData.data.length)
+    }  
+   //Called when page is loaded
+   useEffect(()=>{
+       getData();
+    },[])
+  
+      return(
+        &lt;>
+        &lt;div className="teach-container">
+            &lt;h2>Add Words Here&lt;/h2>
+            &lt;Box
+            component="form"
+                sx={{
+                    '&amp; > :not(style)': { m: 1, width: '25ch' },
+                    marginLeft:'20rem'
+                }}
+                
+            >
+                    &lt;TextField id="engWord" name="engWord" value={wordObj.engWord} onChange={handleInput} label="English Word" variant="outlined" required />
+                    &lt;TextField id="finWord" name="finWord" value={wordObj.finWord} onChange={handleInput} label="Finnish Word" variant="outlined" required />
+                    &lt;TextField id="germanWord" name="germanWord" value={wordObj.germanWord} onChange={handleInput} label="German Word" variant="outlined" required />
+                &lt;br>&lt;/br>
+                &lt;TextField
+                    id="outlined-select-currency"
+                    select
+                    label="Category"
+                    value={wordObj.category || ""}
+                    name="category"
+                    onChange={handleInput}
+                    helperText="Please select a category"
+                    >
+                        &lt;MenuItem value="">None&lt;/MenuItem>
+                    {allTags.map((tag) => (
+                        &lt;MenuItem key={tag.id} value={tag.id}> 
+                        {tag.NAME}
+                        &lt;/MenuItem>
+                    ))}
+                &lt;/TextField>
+                &lt;TextField name="tags" 
+                    label="Add Categories" helperText="Click spacebar to add tags" variant="outlined"
+                    onKeyUp={(event) => event.keyCode === 32 ? addTag(event) : null} />
+            &lt;/Box>
+            &lt;div className="create-messages">
+                        {msg}
+            &lt;/div>
+            &lt;Stack spacing={3} direction="row" sx={{marginLeft:'35rem'}}>
+                {toggleSubmit ? 
+                    (&lt;Button variant="contained" onClick={handleSubmit}>Create&lt;/Button>) :
+                      &lt;Button variant="contained" onClick={handleSubmit}>Edit&lt;/Button>
+                }
+                 &lt;Button variant="contained" onClick={handleReset}>Reset&lt;/Button>
+            &lt;/Stack>
+            
+                    
+                &lt;div>
+                    &lt;input
+                            className="search-box"
+                            type="text"
+                            placeholder="Search Here"
+                            onChange={(event) => setQuery(event.target.value)}
+                        />
+                &lt;/div>                        
+                &lt;TableContainer sx={{maxWidth: 950, borderRadius: 5, margin: 'auto' }} component={Paper}>
+                &lt;Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    &lt;TableHead>
+                    &lt;TableRow>
+                        &lt;TableCell className="table-header" align="center">English Word&lt;/TableCell>
+                        &lt;TableCell className="table-header" align="center">Finnish Word&lt;/TableCell>
+                        &lt;TableCell className="table-header" align="center">German Word&lt;/TableCell>
+                        &lt;TableCell className="table-header" align="center">Category&lt;/TableCell>
+                        &lt;TableCell className="table-header" align="center">Action&lt;/TableCell>
+                    &lt;/TableRow>
+                    &lt;/TableHead>
+                    &lt;TableBody>
+                    {records.filter(record=>{ 
+                         /*FIX: To prevent NULL Pointer Exception.
+                        record.name means category. If category is NULL, then returns an empty string.
+                        Filters records based upon the string typed in Search bar.*/ 
+                        record.name = (record.name!==null) ?  record.name  : ""                   
+                            if(query===""){
+                            return record
+                            }else if(record.eng_word.toLowerCase().includes(query.toLowerCase()) ||
+                                     record.fin_word.toLowerCase().includes(query.toLowerCase()) ||
+                                     record.german_word.toLowerCase().includes(query.toLowerCase()) ||
+                                     record.name.toLowerCase().includes(query.toLowerCase())){
+                                return record
+                            }else return null
+                    })
+                        //Determines rows per page.
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        //Iterates through the records and displays word, its translation and category(if any) within the table.
+                    .map((record,index) => (
+                        &lt;TableRow
+                        key={index}
+                        sx={{ '&amp;:last-child td, &amp;:last-child th': { border: 0 } }}
+                        >
+                        &lt;TableCell align="center">{record.eng_word}&lt;/TableCell>
+                        &lt;TableCell align="center">{record.fin_word}&lt;/TableCell>
+                        &lt;TableCell align="center">{record.german_word}&lt;/TableCell>
+                        &lt;TableCell align="center">{record.name}&lt;/TableCell>
+                        &lt;TableCell align="center">
+                                &lt;DeleteTwoToneIcon
+                                    className="icons delete"
+                                    title="Delete Item"
+                                    onClick={() => removeItem(record.eng_id,record.fin_id, record.german_id)}
+                                />
+
+                                &lt;EditTwoToneIcon
+                                    className="icons edit"
+                                    title="Edit Item"
+                                    onClick={() => editItem(record)}
+                                />
+                        &lt;/TableCell>
+                        &lt;/TableRow>
+                    ))}
+                    &lt;/TableBody>                   
+                        &lt;TableFooter>
+                            &lt;TableRow>
+                                &lt;TablePagination 
+                                    rowsPerPageOptions={[5,10,15, { value: -1, label: 'All' }]}
+                                    component={TableCell}
+                                    count={recordSize}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                />
+                            &lt;/TableRow>                        
+                        &lt;/TableFooter>                
+                &lt;/Table>
+                &lt;/TableContainer>              
+        &lt;/div>  
+        &lt;/>
+    )
+}
+export default Teach;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-connectionFunctions.html">connectionFunctions</a></li><li><a href="module-router.html">router</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connection">connection</a></li><li><a href="global.html#execQuery">execQuery</a></li><li><a href="global.html#getId">getId</a></li><li><a href="global.html#getTableName">getTableName</a></li><li><a href="global.html#Learn">Learn</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#router">router</a></li><li><a href="global.html#StyledTableCell">StyledTableCell</a></li><li><a href="global.html#Teach">Teach</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Sat May 14 2022 10:21:39 GMT+0300 (Eastern European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
