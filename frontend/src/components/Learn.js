@@ -52,7 +52,7 @@ const Learn = () => {
   };
   
    async function getData(){
-      let hr = await axios.get('http://localhost:8080/teach');
+      let hr = await axios.get('/teach');
       console.log(hr.data)
       setRecords(hr.data);
       setRecordSize(hr.data.length)
