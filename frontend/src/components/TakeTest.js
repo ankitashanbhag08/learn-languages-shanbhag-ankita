@@ -24,21 +24,28 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 const axios = require('axios')
 
 const TakeTest = ()=>{
+    //Const variable containing array of languages available in the system.
     const languages = ["English", "Finnish", "German"]
+    //hook object containing the values that we filled in the fields.
     const [langObj, setLangObj] = useState({lang1:"", lang2:"", category:""})
+    //hook for categories/tags
     const [allTags, setAllTags] = useState([])
+    //hook containing the list of words, translated words, categories and answer given by user.
     const [allQuestions, setAllQuestions] = useState([])
+    //sets messages on screen
     const [err, setErr] = useState("")
+    //hook that updates whenever "Verify" button is clicked. Also makes the user's answer field(s) readonly.
     const [verify, setVerify] = useState(false)
+    //updates score
     const[score, setScore] = useState(0)
-
+    //Called when value is changed in any of the text fields/dropdown
     const handleInput = (event) =>{
         let name = event.target.name
         let value = event.target.value
         console.log(name + ":" + value)
         setLangObj({...langObj, [name]:value})
     }
-
+    //Called when "Start Test" is clicked.
     const handleTest = async (event)=>{
         setVerify(false)
         console.log(langObj)
@@ -51,11 +58,12 @@ const TakeTest = ()=>{
             return false
         }
         setErr("")
+        //gets questions and answers from database.
         const hr = await axios.get(`http://localhost:8080/teach/qstns?lang1=${langObj.lang1}&lang2=${langObj.lang2}&catId=${langObj.category}`)
         console.log(hr.data)
         setAllQuestions(hr.data)
     }
-
+    //sets every fields back to the initial state 
     const handleReset = () => {
         setLangObj({lang1:"", lang2:"", category:""})
         setAllQuestions([])
@@ -63,6 +71,7 @@ const TakeTest = ()=>{
         setVerify(false)
         setScore(0)
     }
+    //called when any of answer field in blurred. Saves the state of blurred answer fields.
     const submitAnswer = (e)=>{        
         let name = e.target.name
           let value = e.target.value  
@@ -75,7 +84,8 @@ const TakeTest = ()=>{
                return item
            }))
     }
-
+    /*Called when the user clicks on "verify" button. 
+    Compares user's answers with correct answer and generates the score. */
     const verifyAnswer = ()=>{
         let i = 0
         setVerify(true)
@@ -84,11 +94,11 @@ const TakeTest = ()=>{
                 if(item.word2.toLowerCase()===item.wordTest.toLowerCase()) i++  //answers need not be same case
             }
             
-        }
-        
+        }        
         setScore(i)
         console.log(allQuestions)
     }
+    //gets a list of categories from the database.
     async function getTags(){
         const resp = await axios.get('http://localhost:8080/teach/tags')
         console.log(resp)
