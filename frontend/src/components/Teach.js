@@ -49,7 +49,7 @@ const Teach = ()=>{
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-//Called when value is changed in any of the text fields 
+//Called when value is changed in any of the text fields/dropdown 
   const handleInput = (event)=>{
     const name = event.target.name;
     const value = event.target.value;
@@ -159,7 +159,7 @@ const Teach = ()=>{
       setRecordSize(recordSize-1)
       setMsg(resp.data)
   }
-
+//called whenevre new tag is added
   const addTag = async (e) => {      
     if (e.target.value.toString().trim() === "") {
       setMsg("Enter proper tag name and press space");
