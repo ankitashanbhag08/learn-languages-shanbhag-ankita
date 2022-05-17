@@ -5,10 +5,11 @@ Students can learn these words and then take a test, after which they will get a
 
 ## Demo of Language Learning App
 
-A demo of this application can be found here.
+Click on the thumbnail to view demo of the application.
+
 [![Link To Video](https://img.youtube.com/vi/IMr3McKi8ag/0.jpg)](https://www.youtube.com/watch?v=IMr3McKi8ag)
 
-### Time stamps in the video are as follows:
+Time stamps in the video are as follows:
 
 0:00 - 7:20 - Demo of application
 7:21 - 11:25 - Relevant code
