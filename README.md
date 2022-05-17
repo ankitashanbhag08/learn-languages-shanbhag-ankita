@@ -2,6 +2,8 @@
 
 This is full stack application that helps students to learn forign language grammar. The teacher can add, update, delete the words and their meaning.
 Students can learn these words and then take a test, after which they will get a score.
+The app is installed in heroku.
+Here is the link to view the [Language Learning App](https://heroku-language-learning-app.herokuapp.com/)
 
 ## Demo of Language Learning App
 
@@ -11,9 +13,12 @@ Click on the thumbnail to view demo of the application.
 
 Time stamps in the video are as follows:
 
+```
 0:00 - 7:20 - Demo of application
 7:21 - 11:25 - Relevant code
 11:25 - 12:30 - Bugs and self evaluation.
+
+```
 
 ## Database Structure
 
