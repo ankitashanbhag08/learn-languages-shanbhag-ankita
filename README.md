@@ -2,7 +2,10 @@
 
 This is full stack application that helps students to learn forign language grammar. The teacher can add, update, delete the words and their meaning.
 Students can learn these words and then take a test, after which they will get a score.
-The app is installed in heroku.
+
+## Link for App
+
+The app is deployed in heroku.
 Here is the link to view the [Language Learning App](https://heroku-language-learning-app.herokuapp.com/)
 
 ## Demo of Language Learning App
@@ -76,7 +79,7 @@ ON DELETE SET NULL ON UPDATE CASCADE
 );
 ```
 
-There are categories (optional) for the words that the teacher adds. You can insert some sample categories in the table category_master. Run the following statement.
+There are categories (optional) for the words that the teacher adds. You can insert some sample categories in the table category_master. Run the following statement. However, the second release makes it possible to add categories via UI too.
 
 ```
 INSERT INTO category_master (name) VALUES ("ANIMALS");
