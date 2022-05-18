@@ -157,10 +157,7 @@ After writing down the answers, a student needs to click on verify answer button
 
 ## Next Steps
 
-1. Developing "Take Test" Tab.
-2. Support for more languages.
-3. Dynamic Tags/Categories.
-4. Authentication
+Authentication
 
 ## References
 
