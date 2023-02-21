@@ -8,21 +8,6 @@ Students can learn these words and then take a test, after which they will get a
 The app is deployed in heroku.
 Here is the link to view the [Language Learning App](https://heroku-language-learning-app.herokuapp.com/)
 
-## Demo of Language Learning App
-
-Click on the thumbnail to view demo of the application.
-
-[![Link To Video](https://img.youtube.com/vi/IMr3McKi8ag/0.jpg)](https://www.youtube.com/watch?v=IMr3McKi8ag)
-
-Time stamps in the video are as follows:
-
-```
-0:00 - 7:20 - Demo of application
-7:21 - 11:25 - Relevant code
-11:25 - 12:30 - Bugs and self evaluation.
-
-```
-
 ## Database Structure
 
 The application uses MySQL Database. Run the following statements on the database server to create table.
